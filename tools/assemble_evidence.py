@@ -108,10 +108,31 @@ def main() -> None:
     fixed_refused = find(FIXED, lambda tx, c: "accrue_yield" in c)
 
     claims = {claim["index"]: claim for claim in observed["claims"]}
-    by_verdict = observed["claimsByVerdict"]
-    true_index = (by_verdict.get("EXPLOIT") or [None])[0]
-    false_index = (by_verdict.get("CLEAR") or [None])[0]
-    indeterminate_index = (by_verdict.get("INDETERMINATE") or [None])[0]
+
+    def claim_where(key: str, methods: list, verdict: str):
+        """Select a claim by what it actually read, never by verdict ordering.
+
+        The claim list grows: the adversarial campaign appends further EXPLOIT
+        and INDETERMINATE verdicts against other keys. Picking "the first
+        EXPLOIT" would silently start resolving to a different claim.
+        """
+        for claim in observed["claims"]:
+            if claim["key"] != key or claim["verdict"] != verdict:
+                continue
+            reading = json.loads(claim["pinnedReading"] or "{}")
+            if reading.get("methods") == methods:
+                return claim["index"]
+        return None
+
+    true_index = claim_where("cistern-demo", ["vault_report"], "EXPLOIT")
+    false_index = claim_where(
+        "cistern-demo",
+        ["total_deposited_units", "total_claimable_units", "published_invariant"],
+        "CLEAR",
+    )
+    indeterminate_index = claim_where(
+        "cistern-fixed-control", ["published_invariant"], "INDETERMINATE"
+    )
 
     deployment = {
         "network": {"name": "Studio Next", "chainId": 61997},

@@ -595,3 +595,44 @@ contract defect.
 result meant something other than what it appeared to (D-008, D-009, and now
 this). Every time, the fix was to remove a shared assumption rather than to adjust
 an expectation.
+
+## D-012 — G10 passed only after the reproduction lied to me once
+
+**Observed.** The clean-clone run reached the frontend step and reported:
+
+```
+sh: 1: next: not found
+```
+
+with `node_modules/next` present but `node_modules/.bin` empty. The install had
+been cut short by a timeout. It looked like it had succeeded, because the command
+was written as
+
+```bash
+timeout 1200 npm install ... | tail -3 && npm run build
+```
+
+and the shell took **`tail`'s** exit code, not npm's. So the `&&` passed and the
+build ran against a half-linked tree.
+
+This is the trap PRD §0.6 names in one line: *"Beware `cmd | tail`; the exit code
+is `tail`'s."* Having read that instruction at the start of the build, I then wrote
+the pipeline anyway, and it cost a false failure on the last gate.
+
+**Decided.** Nothing in the repository changes — the code was fine. What changes is
+how the result is reported: the run is recorded in
+`evidence/reproduce/g10-clean-clone.txt` step by step, including the false failure
+and what caused it, rather than as a clean tick. Re-running the install reported
+`changed 85 packages` and the build then compiled four routes.
+
+**Two real friction points for a reviewer**, both now in `REPRODUCE.md`:
+
+1. `npm install` needs `--legacy-peer-deps`, because the pinned prereleases
+   declare peer ranges npm 10 will not resolve, and it takes several minutes. A
+   truncated install fails later and elsewhere, which is a confusing place to
+   debug.
+2. `tools.bootstrap` must run before anything else, including the tests that need
+   no network. `gltest.config.yaml` reads `STANCH_PRIVATE_KEY` while loading its
+   configuration, so without it even a pure source-inspection run stops with a
+   configuration error rather than a test failure. That was found by this same
+   clean-clone run.

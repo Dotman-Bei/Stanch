@@ -1,0 +1,41 @@
+G10 — clean-clone reproduction
+run:    2026-09-15T17:26:51Z
+commit: 8ba9c907a3f7cf2d862d792d198417d64f59e4fd
+
+Fresh git clone into an empty directory, nothing carried over.
+
+1. python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+   genlayer-py 0.19.0rc2, genlayer-test 0.30.0rc2          OK
+
+2. .venv/bin/python -m tools.bootstrap
+   account 0xaECCF8738fCcC6F491A0389535cb50613cfd16bC created
+   funded 500000000000000000000 via sim_fundAccount           OK
+
+3. negative-claim greps, no network
+   .emit(|emit_transfer|contract.deploy|contract.interface   no match
+   def (resume|unhalt|set_status|set_standard|withdraw)      no match
+   payable                                                   no match
+   self.status[...] =                                        exactly 2 (RUNNING, HALTED)
+
+4. source-inspection tests, no network
+   5 passed in 0.04s                                         OK
+
+5. tools.update_ledger against committed evidence
+   identical statuses; only observedAtUtc and baseCommit differ  OK
+
+6. tools.gate_status
+   G0-G8 PASS, G9/G10 NOT YET RUN, identical to the committed table  OK
+
+7. tools.observe_deployment <STANCH>
+   5 claims read live from chain: CLEAR, EXPLOIT, INDETERMINATE,
+   INDETERMINATE, EXPLOIT                                    OK
+
+8. frontend: npm install --legacy-peer-deps && npm run build
+   compiled, 4 routes                                        OK
+
+NOTE. The first attempt at step 8 appeared to succeed and did not.
+The install was cut short by a timeout, and because it was piped through
+'| tail -3' the shell saw tail's exit code rather than npm's, so the chained
+build ran against an incomplete node_modules and failed with 'next: not
+found'. This is the exact trap PRD section 0.6 names. Re-running the install
+reported 'changed 85 packages' and the build then succeeded.

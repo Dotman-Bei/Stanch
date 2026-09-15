@@ -29,7 +29,7 @@ after the fact does nothing anyway; the track wording is *active* exploit.
 
 <!-- GATE-STATUS -->
 
-Recorded 2026-09-15T16:55:06Z against Studio Next, chain 61997.
+Recorded 2026-09-15T17:19:28Z against Studio Next, chain 61997.
 
 | Gate | Condition | Status |
 |---|---|---|
@@ -43,9 +43,9 @@ Recorded 2026-09-15T16:55:06Z against Studio Next, chain 61997.
 | G7 | All five negative claims have committed evidence | **PASS** |
 | G8 | Frontend serves registry, verdict record and proof room with no wallet | **PASS** |
 | G9 | Demo video recorded, showing G3, G4 and G5 | **NOT YET RUN** |
-| G10 | Clean-clone reproduction passes | **NOT YET RUN** |
+| G10 | Clean-clone reproduction passes | **PASS** |
 
-G9 and G10 are not yet run. They are listed as NOT YET RUN rather than omitted.
+G9 are not yet run. They are listed as NOT YET RUN rather than omitted.
 
 ### Deployed on Studio Next
 
@@ -372,6 +372,27 @@ Three rules, non-negotiable:
 - **No mainnet.** Studio Next only.
 - **No multi-target atomic halt, no severity levels, no appeals process.** All are
   breadth, and the build window was under 48 hours.
+
+---
+
+## Reproducing this
+
+`REPRODUCE.md` has every command in the order to run them. Two things will bite
+you otherwise, both found by running the clean clone rather than by imagining it:
+
+1. **Run `python -m tools.bootstrap` first**, even for the tests that need no
+   network. `gltest.config.yaml` reads `STANCH_PRIVATE_KEY` while loading, so
+   without it a pure source-inspection run stops with a configuration error.
+2. **`npm install` needs `--legacy-peer-deps`** and takes several minutes. A
+   truncated install fails later and elsewhere.
+
+G10 is recorded step by step in `evidence/reproduce/g10-clean-clone.txt`,
+including the one step that appeared to pass and had not. Everything in this
+repository can also be re-derived from the chain without trusting any local log:
+
+```bash
+.venv/bin/python -m tools.observe_deployment 0xe3C5B525a413797F86a2742C9C5d1502045EBC24
+```
 
 ---
 

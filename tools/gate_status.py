@@ -60,7 +60,9 @@ def main() -> None:
         results["G1"]
     )
     results["G9"] = None
-    results["G10"] = None
+    results["G10"] = (
+        (ROOT / "evidence" / "reproduce" / "g10-clean-clone.txt").exists() or None
+    )
 
     lines = [START, ""]
     stamp = deployment.get("updatedAtUtc") or datetime.now(timezone.utc).isoformat(
