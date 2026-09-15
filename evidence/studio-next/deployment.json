@@ -365,6 +365,5 @@
     "note": "The claim transaction reverts with exit_code 1 rather than producing a verdict: calling a method the callee does not expose aborts the GenVM run. Nothing is recorded and nothing is halted.",
     "observedAtUtc": "2026-09-15T16:20:19Z"
   },
-  "updatedAtUtc": "2026-09-15T16:25:05Z",
-  "status": "LIVE"
+  "updatedAtUtc": "2026-09-15T16:25:05Z"
 }

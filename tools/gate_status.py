@@ -26,6 +26,7 @@ GATES = [
 ]
 
 MARK = {True: "PASS", False: "FAIL", None: "NOT YET RUN"}
+BLOCKED = "BLOCKED"
 
 
 def load(path: Path):
@@ -45,7 +46,10 @@ def main() -> None:
     results["G3"] = (gates.get("G3") or {}).get("pass")
     results["G4"] = (gates.get("G4") or {}).get("pass")
     results["G5"] = (gates.get("G5") or {}).get("pass")
-    results["G6"] = (gates.get("G6") or {}).get("pass")
+    g6 = gates.get("G6") or {}
+    results["G6"] = g6.get("pass")
+    g6_blocked = bool(g6.get("blocked"))
+    g6_reason = g6.get("reason")
 
     inspection = ROOT / "evidence" / "source-inspection"
     results["G7"] = all(
@@ -68,8 +72,15 @@ def main() -> None:
     lines.append("|---|---|---|")
     for gate, condition in GATES:
         state = results.get(gate)
-        lines.append(f"| {gate} | {condition} | **{MARK.get(state, 'NOT YET RUN')}** |")
+        mark = MARK.get(state, "NOT YET RUN")
+        if gate == "G6" and g6_blocked and state is None:
+            mark = BLOCKED
+        lines.append(f"| {gate} | {condition} | **{mark}** |")
     lines.append("")
+
+    if g6_blocked and results["G6"] is None and g6_reason:
+        lines.append(f"**G6 is blocked, not skipped.** {g6_reason}")
+        lines.append("")
 
     if results["G9"] is None or results["G10"] is None:
         pending = [g for g in ("G9", "G10") if results.get(g) is None]
@@ -96,30 +107,55 @@ def main() -> None:
             address = record.get("address")
             if not address:
                 continue
-            tx = record.get("txHash", "")
+            tx = record.get("txHash") or ""
+            deploy_cell = (
+                f"[`{tx[:18]}…`]({EXPLORER}/tx/{tx})" if tx else "not recovered"
+            )
             lines.append(
-                f"| {label} | [`{address}`]({EXPLORER}/address/{address}) | "
-                f"[`{tx[:18]}…`]({EXPLORER}/tx/{tx}) |"
+                f"| {label} | [`{address}`]({EXPLORER}/address/{address}) | {deploy_cell} |"
             )
         lines.append("")
 
         for gate, key, description in (
             ("G3", "G3", "the true claim that halted CISTERN"),
             ("G5", "G5", "the false claim that was refused"),
-            ("G6", "G6", "the insufficient claim"),
             ("G4", "G4", "the CISTERN write that reverted after the halt"),
         ):
             record = gates.get(key) or {}
-            tx = (record.get("tx") or record.get("depositTx") or {}).get("txHash")
+            blocked = record.get("blockedWrites") or []
+            tx = (record.get("tx") or (blocked[0] if blocked else {}) or {}).get("txHash")
             verdict = record.get("verdict")
             status = record.get("statusAfter") or record.get("statusSeenByTarget")
+            reason = record.get("revertReason")
             if tx:
                 detail = f"verdict `{verdict}`, " if verdict else ""
+                if reason:
+                    detail += f"reverted `{reason}`, "
                 detail += f"target `{status}`" if status else ""
                 lines.append(
                     f"- **{gate}**, {description}: {detail} — "
                     f"[`{tx[:18]}…`]({EXPLORER}/tx/{tx})"
                 )
+
+        unreadable = deployment.get("unreadableMethod") or {}
+        unreadable_tx = (unreadable.get("tx") or {}).get("txHash")
+        if unreadable_tx:
+            lines.append(
+                "- **Not a gate, recorded anyway**: a reading spec naming a method the "
+                "target does not expose reverts the claim transaction, records nothing "
+                "and halts nothing — "
+                f"[`{unreadable_tx[:18]}…`]({EXPLORER}/tx/{unreadable_tx})"
+            )
+
+        control = deployment.get("control") or {}
+        control_tx = (control.get("accrueTx") or {}).get("txHash")
+        if control_tx:
+            lines.append(
+                "- **Control**: the same accrual against `cistern_fixed.py` is refused "
+                f"by the target itself with `{control.get('refusalReason')}`, so the "
+                "invariant never breaks and no claim is possible — "
+                f"[`{control_tx[:18]}…`]({EXPLORER}/tx/{control_tx})"
+            )
         lines.append("")
 
     if cistern.get("address"):

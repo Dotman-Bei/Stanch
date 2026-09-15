@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 WAIT_INTERVAL = 10
 WAIT_RETRIES = 90
+WAIT_UNTIL = "decided"
 _FEE_CACHE: dict = {}
 
 
@@ -40,7 +41,7 @@ def deploy(gl, source: Path, args: Optional[list] = None) -> dict:
     receipt = retry(
         lambda: gl.wait_for_transaction_receipt(
             transaction_hash=tx,
-            wait_until="finalized",
+            wait_until=WAIT_UNTIL,
             retries=WAIT_RETRIES,
             interval=WAIT_INTERVAL,
         ),
@@ -49,24 +50,65 @@ def deploy(gl, source: Path, args: Optional[list] = None) -> dict:
     return summarize(receipt, tx)
 
 
-def call(gl, address: str, method: str, args: Optional[list] = None, value: int = 0) -> dict:
+def call(
+    gl,
+    address: str,
+    method: str,
+    args: Optional[list] = None,
+    value: int = 0,
+    wait_retries: Optional[int] = None,
+    stall_attempts: int = 1,
+) -> dict:
     fees = estimate_fees_for(gl, address, method, args, value)
-    tx = retry(
-        lambda: gl.write_contract(
-            address=address, function_name=method, args=args or [], value=value, fees=fees
-        ),
-        label=f"write {method}",
-    )
-    receipt = retry(
-        lambda: gl.wait_for_transaction_receipt(
-            transaction_hash=tx,
-            wait_until="finalized",
-            retries=WAIT_RETRIES,
-            interval=WAIT_INTERVAL,
-        ),
-        label=f"receipt {method}",
-    )
-    return summarize(receipt, tx)
+    retries = wait_retries or WAIT_RETRIES
+    last_hash = None
+    for attempt in range(stall_attempts):
+        tx = retry(
+            lambda: gl.write_contract(
+                address=address,
+                function_name=method,
+                args=args or [],
+                value=value,
+                fees=fees,
+            ),
+            label=f"write {method}",
+        )
+        last_hash = tx
+        try:
+            receipt = retry(
+                lambda: gl.wait_for_transaction_receipt(
+                    transaction_hash=tx,
+                    wait_until=WAIT_UNTIL,
+                    retries=retries,
+                    interval=WAIT_INTERVAL,
+                ),
+                attempts=2,
+                label=f"receipt {method}",
+            )
+            return summarize(receipt, tx)
+        except Exception as exc:
+            state = stalled_state(gl, tx)
+            print(
+                f"   {method} did not decide within "
+                f"{retries * WAIT_INTERVAL}s (state {state});"
+                f" attempt {attempt + 1} of {stall_attempts}"
+            )
+            if attempt == stall_attempts - 1:
+                return {
+                    "txHash": tx,
+                    "explorer": explorer_tx(tx),
+                    "lifecycle": state,
+                    "executionResult": "DID_NOT_DECIDE",
+                    "stallError": str(exc)[:400],
+                }
+    return {"txHash": last_hash, "executionResult": "DID_NOT_DECIDE"}
+
+
+def stalled_state(gl, tx_hash: str):
+    try:
+        return (gl.get_transaction(tx_hash) or {}).get("lifecycle")
+    except Exception:
+        return None
 
 
 def generic_fees(gl) -> dict:

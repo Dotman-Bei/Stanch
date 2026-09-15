@@ -29,23 +29,40 @@ after the fact does nothing anyway; the track wording is *active* exploit.
 
 <!-- GATE-STATUS -->
 
-Recorded 2026-09-15T15:24:17Z against Studio Next, chain 61997.
+Recorded 2026-09-15T16:25:05Z against Studio Next, chain 61997.
 
 | Gate | Condition | Status |
 |---|---|---|
 | G0 | Probes run on Studio Next, results committed, P3 resolved | **PASS** |
-| G1 | STANCH deployed, address and deploy transaction recorded | **FAIL** |
-| G2 | CISTERN deployed, registered, status_of returns RUNNING | **NOT YET RUN** |
-| G3 | A true claim returns EXPLOIT and flips the status | **NOT YET RUN** |
-| G4 | A CISTERN write reverts with STANCH_HALTED after the flip | **NOT YET RUN** |
-| G5 | A false claim returns CLEAR, the target stays RUNNING | **NOT YET RUN** |
-| G6 | An insufficient claim returns INDETERMINATE | **NOT YET RUN** |
-| G7 | All five negative claims have committed evidence | **FAIL** |
-| G8 | Frontend serves registry, verdict record and proof room with no wallet | **FAIL** |
+| G1 | STANCH deployed, address and deploy transaction recorded | **PASS** |
+| G2 | CISTERN deployed, registered, status_of returns RUNNING | **PASS** |
+| G3 | A true claim returns EXPLOIT and flips the status | **PASS** |
+| G4 | A CISTERN write reverts with STANCH_HALTED after the flip | **PASS** |
+| G5 | A false claim returns CLEAR, the target stays RUNNING | **PASS** |
+| G6 | An insufficient claim returns INDETERMINATE | **BLOCKED** |
+| G7 | All five negative claims have committed evidence | **PASS** |
+| G8 | Frontend serves registry, verdict record and proof room with no wallet | **PASS** |
 | G9 | Demo video recorded, showing G3, G4 and G5 | **NOT YET RUN** |
 | G10 | Clean-clone reproduction passes | **NOT YET RUN** |
 
+**G6 is blocked, not skipped.** Studio Next stopped deciding non-deterministic transactions before G6 could be re-run against the corrected reading spec. Nine consecutive submit_claim transactions stalled in state processing with zero validator votes committed, while deterministic writes on the same contracts continued to decide normally. See DECISIONS.md D-010.
+
 G9 and G10 are not yet run. They are listed as NOT YET RUN rather than omitted.
+
+### Deployed on Studio Next
+
+| Contract | Address | Deploy transaction |
+|---|---|---|
+| STANCH | [`0xe3C5B525a413797F86a2742C9C5d1502045EBC24`](https://explorer-studio-dev.genlayer.com/address/0xe3C5B525a413797F86a2742C9C5d1502045EBC24) | [`0x10627da65e676666…`](https://explorer-studio-dev.genlayer.com/tx/0x10627da65e67666679ec7888ac971f73740eb70599b902212f22bf7ea31f5935) |
+| CISTERN (demo target) | [`0x288aA7651e3260fA13B09bD86c7430FD52585f30`](https://explorer-studio-dev.genlayer.com/address/0x288aA7651e3260fA13B09bD86c7430FD52585f30) | [`0x44e1f34b7c384b6c…`](https://explorer-studio-dev.genlayer.com/tx/0x44e1f34b7c384b6c677e9da014428a2434ce382da8bcd977ea2a8aff7408ef2c) |
+| CISTERN-FIXED (control) | [`0xCac4C9B43FC343b1D5003Bd400299e12b7db271b`](https://explorer-studio-dev.genlayer.com/address/0xCac4C9B43FC343b1D5003Bd400299e12b7db271b) | [`0x6e49958cd3e42f77…`](https://explorer-studio-dev.genlayer.com/tx/0x6e49958cd3e42f77f386f9b7bb415bb889e06535b0cc6be46e6a1b55f872a6a8) |
+| Injection target (campaign) | [`0x84E5C85E5C7a44Ed3f3c950C39953A5d70257C60`](https://explorer-studio-dev.genlayer.com/address/0x84E5C85E5C7a44Ed3f3c950C39953A5d70257C60) | [`0x49fc1c69932c6da8…`](https://explorer-studio-dev.genlayer.com/tx/0x49fc1c69932c6da8090a1a7e5700561c7c8e7dc3a8c0ccd1739fbbf5fa21e327) |
+
+- **G3**, the true claim that halted CISTERN: verdict `EXPLOIT`, target `HALTED` — [`0x2ef44c08e33b2960…`](https://explorer-studio-dev.genlayer.com/tx/0x2ef44c08e33b296020eadd50e29ef7ab722efe9fd048d49a5b997416d47f9241)
+- **G5**, the false claim that was refused: verdict `CLEAR`, target `RUNNING` — [`0x872ca9b94fc91702…`](https://explorer-studio-dev.genlayer.com/tx/0x872ca9b94fc91702e30e23b1434c7943475fb8bb6c87108d1b95d34b1704de53)
+- **G4**, the CISTERN write that reverted after the halt: reverted `STANCH_HALTED`, target `HALTED` — [`0x03b82ac8b1fd2160…`](https://explorer-studio-dev.genlayer.com/tx/0x03b82ac8b1fd216035e1893c1ccad3f4dc77387126f839f4180ebc23fe7b234d)
+- **Not a gate, recorded anyway**: a reading spec naming a method the target does not expose reverts the claim transaction, records nothing and halts nothing — [`0x44c44bd9c195ae1b…`](https://explorer-studio-dev.genlayer.com/tx/0x44c44bd9c195ae1b0a2d8820e66b37d79dd09017099789306283c3dddb1cb1f6)
+- **Control**: the same accrual against `cistern_fixed.py` is refused by the target itself with `NO_UNBACKED_HEADROOM`, so the invariant never breaks and no claim is possible — [`0xb6813ae03383f5c9…`](https://explorer-studio-dev.genlayer.com/tx/0xb6813ae03383f5c91602bbc67a695e09dc487c5a6074e2d01b561a0d9ec062f4)
 
 <!-- /GATE-STATUS -->
 

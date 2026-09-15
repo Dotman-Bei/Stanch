@@ -367,3 +367,126 @@ PRD §17 K2 requires.
 reading of real values, does it show the asserted condition holding now. That is
 the judgment §2 argues cannot be written as a deterministic predicate in advance.
 Everything around it is deterministic.
+
+## D-009 — A missing view method aborts the VM; it cannot be caught and turned into a verdict
+
+**Believed.** After D-008, `_pin_reading` wrapped each cross-contract call in
+`try/except` and recorded `READ_FAILED` for any method that raised, and
+`_reading_defect` turned that into a deterministic `INDETERMINATE`. G6's spec
+names `oracle_price_feed_history`, a method CISTERN does not expose, so it should
+have produced exactly that.
+
+**Observed.** G6's claim transaction did not produce a verdict. It reverted:
+
+```
+executionResult: FINISHED_WITH_ERROR
+leaderStatus:    contract_error
+leaderPayload:   "exit_code 1"
+```
+
+and the gate then read back the *previous* claim, G5's, reporting its `CLEAR` as
+G6's result. The gate had been failing for a reason that was not the reason it
+was testing, for the second time in this build.
+
+Calling a method the callee does not expose is a host-level abort, like the
+sandbox failure in D-007. The Python `try/except` never runs, because the whole
+contract execution is torn down rather than an exception being raised into it.
+
+**Decided.** Two changes, because there are two distinct behaviours and only one
+of them is `INDETERMINATE`.
+
+1. **G6 now uses a reading that is gathered successfully and still cannot decide.**
+   Its spec reads only `published_invariant` — the sentence CISTERN publishes
+   about itself — with none of the numbers that would show whether the invariant
+   is violated. That is what "insufficient" means: the read worked, and the
+   result does not settle the question.
+
+2. **The missing-method case is recorded as its own observation,**
+   `evidence/studio-next/unreadable-method-reverts.json`, asserting what actually
+   happens: the transaction reverts, the claim list does not grow, and the target
+   stays `RUNNING`. Safe, but not a verdict, and the ledger says so rather than
+   implying STANCH classified anything.
+
+`_reading_defect` stays. It still catches the failures that *are* catchable — a
+spec that is not JSON, a spec with no methods, an empty reading — and
+`READ_FAILED` remains as a backstop rather than a load-bearing path.
+
+**The frontend now blocks this client-side**, which is what PRD §9 asked for all
+along: *"Malformed reading is refused client-side with the reason."* The claim
+form previews every method against the live target before anything is signed, and
+refuses to submit if any of them cannot be read, naming the method. A user cannot
+spend a transaction discovering this.
+
+**Twice now a gate has passed or failed for a reason other than the one under
+test** (D-008, and this). Both times the tell was the same: the number agreed with
+the expectation by accident. The gate runner now records `claimCountBefore` and
+`claimCountAfter` around every claim, so a transaction that recorded nothing can
+no longer be read as a verdict about something.
+
+## D-010 — Studio Next stopped deciding non-deterministic transactions, and G6 is blocked by it
+
+**Observed.** After the D-009 fix, `submit_claim` transactions stopped reaching a
+decision. Nine consecutive attempts across three gates, each waited out for
+1500 seconds:
+
+```
+submit_claim did not decide within 1500s (state {'state': 'processing', 'phase': 'pending'})
+```
+
+An earlier one sat in `processing / committing` with `rotations_left: 3` and
+`votes_committed: 0` for over eight minutes of direct polling — no validator
+committed a vote at all. `result_name` read `NO_MAJORITY`, which at zero votes is
+the initial value rather than an outcome.
+
+**This is not the standard failing to reach consensus.** It is the transactions
+not being processed. Deterministic writes against the same contracts, from the
+same account, in the same minutes, decided normally:
+
+```
+deposit: FINISHED_WITH_RETURN {'state': 'decided', 'outcome': 'accepted'}
+```
+
+So the chain was up; only the path that calls a model was not moving. That
+distinction matters, because PRD §17 offers two different responses and they are
+not interchangeable. **K2** is *"`prompt_non_comparative` cannot reach consensus
+on the classification"* — the answer there is to narrow the standard. **K3** is
+*"Studio Next is unavailable"* — the answer there is to stop claiming and say so.
+This is K3 wearing K2's clothes, and narrowing the standard in response would have
+been changing the product to fix a network outage.
+
+**Decided.** G6 is recorded as **BLOCKED**, with the reason, in the README gate
+table and in `evidence/studio-next/g6-indeterminate.json`. It is not marked
+failed, because nothing was measured, and it is not omitted.
+`G6-INDETERMINATE-DISTINCT` stays `UNMEASURED` in the ledger.
+
+**What was preserved, and how.** An earlier full gate run had already completed
+against STANCH at `0xe3C5B525a413797F86a2742C9C5d1502045EBC24`, and its results
+are still on chain. Rather than re-run anything or replay a local log, the
+evidence was rebuilt from the network itself:
+
+- `tools/observe_deployment.py` reads the deployed contracts live — the registry,
+  every claim record with its pinned reading, the root slot, and both vault
+  reports.
+- `tools/recover_transactions.py` pulls the full transaction history for each
+  address through `sim_getTransactionsForAddress` and decodes each calldata, so
+  every hash in the README is identified by what it actually called rather than by
+  position in a log.
+- `tools/assemble_evidence.py` joins the two into `deployment.json` and the
+  per-gate files.
+
+The `STANCH_HALTED` revert in G4 was produced fresh during that observation, by
+attempting a deposit against the halted CISTERN. It is a transaction from today,
+not a recovered one.
+
+**What this costs the submission, stated plainly.** G6 has no Studio Next
+observation. The `INDETERMINATE` path is exercised in `tests/` and is decided
+deterministically in `_reading_defect` before any model runs, so it is source- and
+test-supported rather than network-supported, and the ledger says exactly that.
+
+**What it is worth keeping.** For an emergency-halt product this is the most
+important limitation found in the whole build, and it is not a bug in STANCH. If
+the chain will not process the verdict transaction, the halt does not happen. A
+guardian that must wait on consensus inherits consensus availability as a failure
+mode, and no amount of removing the guardian's powers fixes that. It is now a
+standing caveat in `evidence/claims.json` and a non-goal in the README rather
+than something a reviewer has to discover.

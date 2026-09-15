@@ -9,6 +9,7 @@ HEALTHY_SPEC = (
     '"published_invariant"]}'
 )
 REPORT_SPEC = '{"methods": ["vault_report"]}'
+INSUFFICIENT_SPEC = '{"methods": ["published_invariant"]}'
 MISSING_SPEC = '{"methods": ["oracle_price_feed_history"]}'
 
 

@@ -19,6 +19,7 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
   const [spec, setSpec] = useState(SPEC_PRESETS[0].spec);
   const [pattern, setPattern] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
+  const [unreadable, setUnreadable] = useState<string[] | null>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
@@ -41,13 +42,14 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
     }
   }
 
-  async function readPreview() {
-    if (!check.ok || !target) return;
+  async function readPreview(): Promise<string[] | null> {
+    if (!check.ok || !target) return null;
     setPhase("previewing");
     setMessage(null);
     try {
       const client = createClient({ chain: GENLAYER_CHAIN });
       const readings: Record<string, string> = {};
+      const failed: string[] = [];
       for (const method of check.methods) {
         try {
           readings[method] = String(
@@ -59,8 +61,10 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
           );
         } catch {
           readings[method] = "READ_FAILED";
+          failed.push(method);
         }
       }
+      setUnreadable(failed);
       setPreview(
         JSON.stringify(
           {
@@ -74,14 +78,30 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
         ),
       );
       setPhase("idle");
+      return failed;
     } catch (exception) {
       setPhase("failed");
       setMessage(exception instanceof Error ? exception.message : String(exception));
+      return null;
     }
   }
 
   async function submit() {
     if (!check.ok || !target || !account) return;
+
+    const failed = unreadable ?? (await readPreview());
+    if (failed === null) return;
+    if (failed.length > 0) {
+      setPhase("failed");
+      setMessage(
+        `${target.target} does not expose ${failed.join(", ")}. Calling a method a ` +
+          "contract does not have aborts the GenVM run, so this claim would revert " +
+          "without producing a verdict and without being recorded. Fix the reading " +
+          "recipe before signing.",
+      );
+      return;
+    }
+
     setPhase("signing");
     setMessage(null);
     try {
@@ -104,7 +124,11 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
     }
   }
 
-  const disabled = !check.ok || !target || pattern.trim() === "";
+  const disabled =
+    !check.ok ||
+    !target ||
+    pattern.trim() === "" ||
+    (unreadable !== null && unreadable.length > 0);
 
   return (
     <div className="grid gap-5 lg:grid-cols-[1.05fr_1fr]">
@@ -121,7 +145,11 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
                 <button
                   key={row.key}
                   type="button"
-                  onClick={() => setKey(row.key)}
+                  onClick={() => {
+                    setKey(row.key);
+                    setUnreadable(null);
+                    setPreview(null);
+                  }}
                   className={`mono rounded-full border-[3px] border-black px-4 py-2 text-[12px] font-bold transition-all ${
                     key === row.key
                       ? "bg-[#CCFF00] text-black shadow-[4px_4px_0px_#000000]"
@@ -153,7 +181,10 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
               <button
                 key={preset.label}
                 type="button"
-                onClick={() => setSpec(preset.spec)}
+                onClick={() => {
+                  setSpec(preset.spec);
+                  setUnreadable(null);
+                }}
                 className="rounded-full border-2 border-black/30 bg-white px-3 py-1 text-[11px] font-black uppercase tracking-wider text-black/70 hover:border-black hover:text-black"
               >
                 {preset.label}
@@ -162,7 +193,10 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
           </div>
           <textarea
             value={spec}
-            onChange={(event) => setSpec(event.target.value)}
+            onChange={(event) => {
+              setSpec(event.target.value);
+              setUnreadable(null);
+            }}
             rows={3}
             spellCheck={false}
             className="mono w-full rounded-2xl border-[2.5px] border-black bg-white px-4 py-3 text-[13px] text-black outline-none focus:shadow-[4px_4px_0px_#CCFF00]"
@@ -201,6 +235,12 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
           >
             {phase === "previewing" ? "reading…" : "Show the exact bytes"}
           </button>
+
+          {unreadable && unreadable.length > 0 ? (
+            <span className="mono text-[11px] font-bold uppercase tracking-wider text-black">
+              {unreadable.length} method{unreadable.length === 1 ? "" : "s"} unreadable
+            </span>
+          ) : null}
 
           {account ? (
             <button
@@ -259,6 +299,17 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
           <pre className="mono mt-4 max-h-[420px] overflow-auto rounded-2xl border-[1.5px] border-white/30 bg-black/40 px-4 py-3 text-[12px] leading-relaxed text-white">
             {preview ?? "Press “Show the exact bytes”."}
           </pre>
+          {unreadable && unreadable.length > 0 ? (
+            <p className="mt-3 rounded-2xl border-[1.5px] border-[#CCFF00] bg-black/50 px-4 py-3 text-[12px] leading-relaxed text-[#CCFF00]">
+              <span className="font-black uppercase tracking-wider">
+                refused before signing:
+              </span>{" "}
+              this target does not expose{" "}
+              <span className="mono">{unreadable.join(", ")}</span>. Calling a method a
+              contract does not have aborts the GenVM run, so the claim would revert
+              without producing a verdict and without being recorded.
+            </p>
+          ) : null}
         </div>
 
         <div className="rounded-[1.5rem] border-[3px] border-black bg-black px-5 py-4 text-white shadow-[5px_5px_0px_#CCFF00]">

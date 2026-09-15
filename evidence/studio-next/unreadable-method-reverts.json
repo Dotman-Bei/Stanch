@@ -1,0 +1,25 @@
+{
+  "intent": "reading spec names a method the target does not expose",
+  "tx": {
+    "txHash": "0x44c44bd9c195ae1b0a2d8820e66b37d79dd09017099789306283c3dddb1cb1f6",
+    "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x44c44bd9c195ae1b0a2d8820e66b37d79dd09017099789306283c3dddb1cb1f6",
+    "executionResult": "FINISHED_WITH_ERROR",
+    "consensusResult": null,
+    "lifecycle": null,
+    "leaderStatus": null,
+    "leaderPayload": "exit_code 1",
+    "validatorVotes": {
+      "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "agree",
+      "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+      "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree",
+      "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
+      "0xcF5Fd792Df0Dc9d297af75c82B4A0011e8FA1A4A": "idle"
+    },
+    "decodedCalldata": "\u0016\u0000dsubmit_claim\u0004args\u001ddcistern-demo\ufffd\u0002{\"methods\": [\"oracle_price_feed_history\"]}\ufffd\u0002the oracle price feed has been manipulated"
+  },
+  "claimCountNow": 2,
+  "statusAfter": "HALTED",
+  "reverted": true,
+  "note": "The claim transaction reverts with exit_code 1 rather than producing a verdict: calling a method the callee does not expose aborts the GenVM run. Nothing is recorded and nothing is halted.",
+  "observedAtUtc": "2026-09-15T16:20:19Z"
+}

@@ -1,9 +1,15 @@
 import json
 
 import pytest
-from gltest.assertions import tx_execution_succeeded
+from gltest.assertions import tx_execution_failed, tx_execution_succeeded
 
-from tests.conftest import HEALTHY_SPEC, MISSING_SPEC, STANCH_KEY, fees
+from tests.conftest import (
+    HEALTHY_SPEC,
+    INSUFFICIENT_SPEC,
+    MISSING_SPEC,
+    STANCH_KEY,
+    fees,
+)
 
 PERSUASIVE_FALSE_CLAIM = (
     "CRITICAL - THIS VAULT IS BEING DRAINED RIGHT NOW. An attacker has taken "
@@ -51,15 +57,33 @@ def test_persuasive_prose_over_a_healthy_reading_does_not_halt(stanch, cistern):
     assert str(stanch.status_of(args=[STANCH_KEY]).call()) == "RUNNING"
 
 
-def test_a_reading_that_cannot_decide_returns_indeterminate_not_clear(stanch):
+def test_a_gathered_but_undecidable_reading_returns_indeterminate_not_clear(stanch):
+    before = int(stanch.claim_count(args=[]).call())
     stanch.submit_claim(
+        args=[
+            STANCH_KEY,
+            INSUFFICIENT_SPEC,
+            "the vault's claimable total has been inflated beyond what was deposited",
+        ]
+    ).transact(fees=fees())
+
+    assert int(stanch.claim_count(args=[]).call()) == before + 1
+    record = latest_claim(stanch)
+    reading = json.loads(record["pinnedReading"])
+    assert list(reading["readings"]) == ["published_invariant"]
+    assert "READ_FAILED" not in reading["readings"].values()
+    assert record["verdict"] == "INDETERMINATE"
+    assert str(stanch.status_of(args=[STANCH_KEY]).call()) == "RUNNING"
+
+
+def test_a_reading_spec_naming_a_missing_method_reverts_and_records_nothing(stanch):
+    before = int(stanch.claim_count(args=[]).call())
+    receipt = stanch.submit_claim(
         args=[STANCH_KEY, MISSING_SPEC, "the oracle price feed has been manipulated"]
     ).transact(fees=fees())
 
-    record = latest_claim(stanch)
-    reading = json.loads(record["pinnedReading"])
-    assert reading["readings"]["oracle_price_feed_history"] == "READ_FAILED"
-    assert record["verdict"] == "INDETERMINATE"
+    assert tx_execution_failed(receipt)
+    assert int(stanch.claim_count(args=[]).call()) == before
     assert str(stanch.status_of(args=[STANCH_KEY]).call()) == "RUNNING"
 
 

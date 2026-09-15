@@ -53,6 +53,11 @@ export const SPEC_PRESETS: { label: string; spec: string; note: string }[] = [
     note: "One call returning the target's own invariant statement alongside its numbers.",
   },
   {
+    label: "Invariant only (insufficient)",
+    spec: JSON.stringify({ methods: ["published_invariant"] }),
+    note: "Reads the sentence the target publishes about itself and none of the numbers. Gathers fine, and cannot decide anything — this is what INDETERMINATE is for.",
+  },
+  {
     label: "Separate totals",
     spec: JSON.stringify({
       methods: ["total_deposited_units", "total_claimable_units", "published_invariant"],

@@ -1,0 +1,7 @@
+{
+  "gate": "G6",
+  "pass": null,
+  "blocked": true,
+  "reason": "Studio Next stopped deciding non-deterministic transactions before G6 could be re-run against the corrected reading spec. Nine consecutive submit_claim transactions stalled in state processing with zero validator votes committed, while deterministic writes on the same contracts continued to decide normally. See DECISIONS.md D-010.",
+  "observedAtUtc": "2026-09-15T16:25:05Z"
+}

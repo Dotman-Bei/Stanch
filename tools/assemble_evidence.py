@@ -1,0 +1,259 @@
+import base64
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+from tools.studio_next import explorer_address, explorer_tx
+
+ROOT = Path(__file__).resolve().parent.parent
+STUDIO = ROOT / "evidence" / "studio-next"
+
+STANCH = "0xe3C5B525a413797F86a2742C9C5d1502045EBC24"
+CISTERN = "0x288aA7651e3260fA13B09bD86c7430FD52585f30"
+FIXED = "0xCac4C9B43FC343b1D5003Bd400299e12b7db271b"
+INJECTION = "0x84E5C85E5C7a44Ed3f3c950C39953A5d70257C60"
+
+
+def now() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def readable(calldata: str) -> str:
+    if not calldata:
+        return ""
+    try:
+        return base64.b64decode(calldata).decode("utf-8", "replace")
+    except Exception:
+        return ""
+
+
+def decode_payload(payload):
+    if not isinstance(payload, str):
+        return payload
+    try:
+        raw = base64.b64decode(payload, validate=True)
+    except Exception:
+        return payload
+    text = raw.decode("utf-8", "replace").lstrip("\x00\x01\x02")
+    return text if text.isprintable() and text.strip() else payload
+
+
+def record(tx: dict) -> dict:
+    return {
+        "txHash": tx["txHash"],
+        "explorer": tx["explorer"],
+        "executionResult": tx["executionResult"],
+        "consensusResult": tx["consensusResult"],
+        "lifecycle": tx["lifecycle"],
+        "leaderStatus": tx.get("leaderStatus"),
+        "leaderPayload": decode_payload(tx.get("leaderPayload")),
+        "validatorVotes": tx.get("validatorVotes"),
+        "decodedCalldata": readable(tx.get("calldata") or ""),
+    }
+
+
+def main() -> None:
+    txs = json.loads((STUDIO / "transactions.json").read_text())
+    observed = json.loads((STUDIO / "observed-deployment.json").read_text())
+
+    def rows(address: str) -> list:
+        return txs[address]["transactions"]
+
+    def find(address, predicate):
+        for tx in rows(address):
+            if predicate(tx, readable(tx.get("calldata") or "")):
+                return tx
+        return None
+
+    stanch_deploy = find(STANCH, lambda tx, _: tx["isDeploy"])
+    cistern_deploy = find(CISTERN, lambda tx, _: tx["isDeploy"])
+    fixed_deploy = find(FIXED, lambda tx, _: tx["isDeploy"])
+    injection_deploy = find(INJECTION, lambda tx, _: tx["isDeploy"])
+
+    reg_demo = find(STANCH, lambda tx, c: "register" in c and "cistern-demo" in c)
+    reg_fixed = find(STANCH, lambda tx, c: "register" in c and "cistern-fixed" in c)
+    reg_injection = find(STANCH, lambda tx, c: "register" in c and "injection" in c)
+
+    claim_true = find(
+        STANCH,
+        lambda tx, c: "submit_claim" in c and "vault_report" in c
+        and tx["executionResult"] == "FINISHED_WITH_RETURN",
+    )
+    claim_false = find(
+        STANCH,
+        lambda tx, c: "submit_claim" in c and "total_deposited_units" in c
+        and tx["executionResult"] == "FINISHED_WITH_RETURN",
+    )
+    claim_unreadable = find(
+        STANCH,
+        lambda tx, c: "submit_claim" in c and "oracle_price_feed_history" in c,
+    )
+
+    cistern_deposit = find(
+        CISTERN,
+        lambda tx, c: "deposit" in c and tx["executionResult"] == "FINISHED_WITH_RETURN",
+    )
+    cistern_accrue = find(CISTERN, lambda tx, c: "accrue_yield" in c)
+    cistern_blocked = [
+        tx for tx in rows(CISTERN)
+        if "deposit" in readable(tx.get("calldata") or "")
+        and tx["executionResult"] != "FINISHED_WITH_RETURN"
+    ]
+    fixed_refused = find(FIXED, lambda tx, c: "accrue_yield" in c)
+
+    claims = {claim["index"]: claim for claim in observed["claims"]}
+    by_verdict = observed["claimsByVerdict"]
+    true_index = (by_verdict.get("EXPLOIT") or [None])[0]
+    false_index = (by_verdict.get("CLEAR") or [None])[0]
+
+    deployment = {
+        "network": {"name": "Studio Next", "chainId": 61997},
+        "assembledAtUtc": now(),
+        "note": (
+            "Addresses and transaction hashes recovered from Studio Next through "
+            "sim_getTransactionsForAddress, and contract state read live. Nothing "
+            "here is replayed from a local log."
+        ),
+        "stanch": {**record(stanch_deploy), "address": STANCH,
+                   "addressExplorer": explorer_address(STANCH)},
+        "cistern": {**record(cistern_deploy), "address": CISTERN,
+                    "addressExplorer": explorer_address(CISTERN)},
+        "cistern_fixed": {**record(fixed_deploy), "address": FIXED,
+                          "addressExplorer": explorer_address(FIXED)},
+        "injection_target": {
+            **(record(injection_deploy) if injection_deploy else {}),
+            "address": INJECTION,
+            "addressExplorer": explorer_address(INJECTION),
+        },
+        "registrations": {
+            "cistern-demo": {"tx": record(reg_demo), "target": CISTERN,
+                             "statusAfter": "RUNNING"},
+            "cistern-fixed-control": {"tx": record(reg_fixed), "target": FIXED,
+                                      "statusAfter": "RUNNING"},
+            "injection-target": {"tx": record(reg_injection), "target": INJECTION,
+                                 "statusAfter": "RUNNING"},
+        },
+        "gates": {},
+    }
+
+    gates = deployment["gates"]
+
+    gates["G2"] = {
+        "gate": "G2",
+        "statusOf": observed["targets"]["cistern-demo"]["status"],
+        "statusAtRegistration": "RUNNING",
+        "unregisteredKeyReads": observed["unregisteredKeyReads"],
+        "registrationTx": record(reg_demo),
+        "observedAtUtc": observed["observedAtUtc"],
+        "pass": observed["unregisteredKeyReads"] == "UNKNOWN",
+    }
+
+    if claim_false and false_index is not None:
+        gates["G5"] = {
+            "gate": "G5",
+            "intent": "prose asserts an active drain; the pinned reading shows a healthy invariant",
+            "tx": record(claim_false),
+            "claim": json.dumps(claims[false_index]),
+            "verdict": claims[false_index]["verdict"],
+            "pattern": claims[false_index]["pattern"],
+            "pinnedReading": claims[false_index]["pinnedReading"],
+            "statusAfter": claims[false_index]["statusAfter"],
+            "observedAtUtc": observed["observedAtUtc"],
+            "pass": claims[false_index]["verdict"] == "CLEAR"
+            and claims[false_index]["statusAfter"] == "RUNNING",
+        }
+
+    if claim_true and true_index is not None:
+        gates["G3"] = {
+            "gate": "G3",
+            "tx": record(claim_true),
+            "claim": json.dumps(claims[true_index]),
+            "verdict": claims[true_index]["verdict"],
+            "pattern": claims[true_index]["pattern"],
+            "pinnedReading": claims[true_index]["pinnedReading"],
+            "statusAfter": claims[true_index]["statusAfter"],
+            "statusNow": observed["targets"]["cistern-demo"]["status"],
+            "exploitTx": record(cistern_accrue) if cistern_accrue else None,
+            "seedTx": record(cistern_deposit) if cistern_deposit else None,
+            "observedAtUtc": observed["observedAtUtc"],
+            "pass": claims[true_index]["verdict"] == "EXPLOIT"
+            and observed["targets"]["cistern-demo"]["status"] == "HALTED",
+        }
+
+    gates["G4"] = {
+        "gate": "G4",
+        "statusSeenByTarget": observed["cistern"]["statusAsCisternReadsIt"],
+        "blockedWrites": [record(tx) for tx in cistern_blocked],
+        "revertReason": observed["cistern"]["writeAttemptAfterHalt"].get("leaderPayload"),
+        "vaultReportAfter": json.dumps(observed["cistern"]["vaultReport"]),
+        "observedAtUtc": observed["observedAtUtc"],
+        "pass": observed["cistern"]["statusAsCisternReadsIt"] == "HALTED"
+        and observed["cistern"]["writeReverted"] is True,
+    }
+
+    gates["G6"] = {
+        "gate": "G6",
+        "pass": None,
+        "blocked": True,
+        "reason": (
+            "Studio Next stopped deciding non-deterministic transactions before G6 "
+            "could be re-run against the corrected reading spec. Nine consecutive "
+            "submit_claim transactions stalled in state processing with zero validator "
+            "votes committed, while deterministic writes on the same contracts "
+            "continued to decide normally. See DECISIONS.md D-010."
+        ),
+        "observedAtUtc": now(),
+    }
+
+    unreadable = {
+        "intent": "reading spec names a method the target does not expose",
+        "tx": record(claim_unreadable) if claim_unreadable else None,
+        "claimCountNow": observed["claimCount"],
+        "statusAfter": observed["targets"]["cistern-demo"]["status"],
+        "reverted": claim_unreadable["executionResult"] != "FINISHED_WITH_RETURN"
+        if claim_unreadable else None,
+        "note": (
+            "The claim transaction reverts with exit_code 1 rather than producing a "
+            "verdict: calling a method the callee does not expose aborts the GenVM run. "
+            "Nothing is recorded and nothing is halted."
+        ),
+        "observedAtUtc": observed["observedAtUtc"],
+    }
+
+    control = {
+        "target": FIXED,
+        "key": "cistern-fixed-control",
+        "accrueTx": record(fixed_refused) if fixed_refused else None,
+        "refused": fixed_refused["executionResult"] != "FINISHED_WITH_RETURN"
+        if fixed_refused else None,
+        "refusalReason": decode_payload(fixed_refused.get("leaderPayload"))
+        if fixed_refused else None,
+        "vaultReport": json.dumps(observed["cisternFixed"]["vaultReport"]),
+        "statusAfter": observed["cisternFixed"]["statusInStanch"],
+        "observedAtUtc": observed["observedAtUtc"],
+    }
+
+    deployment["control"] = control
+    deployment["unreadableMethod"] = unreadable
+    deployment["updatedAtUtc"] = now()
+
+    (STUDIO / "deployment.json").write_text(json.dumps(deployment, indent=2) + "\n")
+    for name, payload in (
+        ("g2-registered-running.json", gates["G2"]),
+        ("g3-true-halt.json", gates.get("G3")),
+        ("g4-halted-revert.json", gates["G4"]),
+        ("g5-false-claim.json", gates.get("G5")),
+        ("g6-indeterminate.json", gates["G6"]),
+        ("unreadable-method-reverts.json", unreadable),
+        ("control-fixed-target.json", control),
+    ):
+        if payload is not None:
+            (STUDIO / name).write_text(json.dumps(payload, indent=2) + "\n")
+
+    print("assembled. gates:", {k: v.get("pass") for k, v in gates.items()})
+    print("control refused:", control["refused"], control["refusalReason"])
+    print("unreadable reverted:", unreadable["reverted"])
+
+
+if __name__ == "__main__":
+    main()

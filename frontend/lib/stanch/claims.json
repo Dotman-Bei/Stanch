@@ -1,9 +1,9 @@
 {
   "schemaVersion": "stanch.claims/1",
   "project": "STANCH",
-  "updatedAtUtc": "2026-09-15T15:24:52Z",
+  "updatedAtUtc": "2026-09-15T16:25:23Z",
   "revision": {
-    "baseCommit": "85f51be5d3a9b0ace815922b5db176da259eb6d7",
+    "baseCommit": "e81cce0e9bc2040ac203ff2270d570a78e56286e",
     "branch": "main"
   },
   "network": {
@@ -40,7 +40,8 @@
     "STANCH reads current state only. An exploit that has completed and left no readable trace cannot be halted.",
     "A refusal observed through a read call is not a mined reverted transaction, and rows say which was observed.",
     "Validator agreement on a classification is agreement, not correctness.",
-    "The demo target's defect was authored by us. Nothing here is detection of an unknown exploit in an unfamiliar contract."
+    "The demo target's defect was authored by us. Nothing here is detection of an unknown exploit in an unfamiliar contract.",
+    "A halt requires a transaction the network will process. On 2026-09-15 Studio Next stopped deciding non-deterministic transactions for a sustained period while deterministic writes continued normally; during that window no verdict could be reached and therefore no target could be halted. Removing the guardian's powers does not remove consensus availability as a failure mode."
   ],
   "claims": [
     {
@@ -54,7 +55,7 @@
         "chainId": 61997,
         "probe": "P3"
       },
-      "observedAtUtc": "2026-09-15T15:24:52Z",
+      "observedAtUtc": "2026-09-15T16:25:23Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -75,7 +76,7 @@
         "chainId": 61997,
         "probe": "P2"
       },
-      "observedAtUtc": "2026-09-15T15:24:52Z",
+      "observedAtUtc": "2026-09-15T16:25:23Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -141,7 +142,7 @@
       "scope": {
         "contract": "contracts/stanch.py"
       },
-      "observedAtUtc": "2026-09-15T15:24:52Z",
+      "observedAtUtc": "2026-09-15T16:25:23Z",
       "evidence": [
         "evidence/source-inspection/n1-no-resume.txt"
       ],
@@ -164,7 +165,7 @@
       "scope": {
         "contract": "contracts/stanch.py"
       },
-      "observedAtUtc": "2026-09-15T15:24:52Z",
+      "observedAtUtc": "2026-09-15T16:25:23Z",
       "evidence": [
         "evidence/source-inspection/n2-no-write-path.txt"
       ],
@@ -186,7 +187,7 @@
         "contract": "contracts/stanch.py",
         "chainId": 61997
       },
-      "observedAtUtc": "2026-09-15T15:24:52Z",
+      "observedAtUtc": "2026-09-15T16:25:23Z",
       "evidence": [
         "evidence/source-inspection/n3-no-payable.txt"
       ],
@@ -200,13 +201,16 @@
     {
       "id": "N4-FALSE-CLAIM-REFUSED",
       "claim": "A submitted claim whose pinned reading does not support the asserted pattern returns CLEAR and does not halt the target; the target was still RUNNING after the verdict.",
-      "status": "UNMEASURED",
-      "evidenceClasses": [],
+      "status": "SUPPORTED",
+      "evidenceClasses": [
+        "consensus_receipt",
+        "studio_next_observation"
+      ],
       "scope": {
         "chainId": 61997,
         "gate": "G5"
       },
-      "observedAtUtc": null,
+      "observedAtUtc": "2026-09-15T16:25:23Z",
       "evidence": [
         "evidence/studio-next/g5-false-claim.json"
       ],
@@ -228,7 +232,7 @@
         "chainId": 61997,
         "probe": "P5"
       },
-      "observedAtUtc": "2026-09-15T15:24:52Z",
+      "observedAtUtc": "2026-09-15T16:25:23Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -244,13 +248,16 @@
     {
       "id": "G3-TRUE-HALT-ON-CONSENSUS",
       "claim": "A claim pointing at a genuinely violated invariant in CISTERN returned EXPLOIT under validator consensus and flipped the registered status to HALTED in a finalized transaction.",
-      "status": "UNMEASURED",
-      "evidenceClasses": [],
+      "status": "SUPPORTED",
+      "evidenceClasses": [
+        "consensus_receipt",
+        "studio_next_observation"
+      ],
       "scope": {
         "chainId": 61997,
         "gate": "G3"
       },
-      "observedAtUtc": null,
+      "observedAtUtc": "2026-09-15T16:25:23Z",
       "evidence": [
         "evidence/studio-next/g3-true-halt.json"
       ],
@@ -264,13 +271,15 @@
     {
       "id": "G4-TARGET-SELF-ENFORCES",
       "claim": "After the status flip, a CISTERN state-changing call reverted with STANCH_HALTED, and the refusal was produced by CISTERN reading STANCH, not by STANCH writing to CISTERN.",
-      "status": "UNMEASURED",
-      "evidenceClasses": [],
+      "status": "SUPPORTED",
+      "evidenceClasses": [
+        "studio_next_observation"
+      ],
       "scope": {
         "chainId": 61997,
         "gate": "G4"
       },
-      "observedAtUtc": null,
+      "observedAtUtc": "2026-09-15T16:25:23Z",
       "evidence": [
         "evidence/studio-next/g4-halted-revert.json"
       ],
@@ -295,7 +304,9 @@
       ],
       "reproduce": "See REPRODUCE.md, gate G6",
       "limitations": [
-        "One observation. No rate of indeterminate outcomes has been measured.",
+        "No Studio Next observation exists. Gate G6 is BLOCKED, not failed: the network stopped deciding non-deterministic transactions before it could be run against the corrected reading spec. See DECISIONS.md D-010.",
+        "The INDETERMINATE path is decided deterministically in _reading_defect before any classifier runs, so it is established by source inspection and by tests/test_verdict_pipeline.py rather than by a consensus receipt.",
+        "A reading spec naming a method the target does not expose is a different case and does not produce INDETERMINATE at all: the claim transaction reverts and records nothing. That one is observed, in evidence/studio-next/unreadable-method-reverts.json.",
         "Display behaviour is a publisher_claim about our own interface until independently checked."
       ]
     },
