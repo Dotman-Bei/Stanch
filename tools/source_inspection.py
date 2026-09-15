@@ -12,7 +12,7 @@ CHECKS = [
         [
             ("grep -nE 'def (resume|unhalt|set_status|set_standard|withdraw)' contracts/stanch.py", "expect: no output"),
             ("grep -n 'RUNNING' contracts/stanch.py", "expect: the constant, the register assignment, and comparisons only"),
-            ("grep -n 'self.status\\[' contracts/stanch.py", "expect: exactly one RUNNING write in register, one HALTED write in submit_claim"),
+            ("grep -nE 'self\\.status\\[[^]]*\\] = ' contracts/stanch.py", "expect: exactly two lines, one RUNNING in register and one HALTED in submit_claim"),
         ],
     ),
     (

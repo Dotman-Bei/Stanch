@@ -1,6 +1,6 @@
 N3 — no payable method and no value custody
-observed: 2026-09-15T15:22:50Z
-commit:   85f51be5d3a9b0ace815922b5db176da259eb6d7
+observed: 2026-09-15T16:32:45Z
+commit:   6aad1045c2f59489c698503595f657d7aead577e
 
 $ grep -n 'payable' contracts/stanch.py
 # expect: no output

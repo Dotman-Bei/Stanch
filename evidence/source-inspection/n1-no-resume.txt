@@ -1,6 +1,6 @@
 N1 — no method restores RUNNING after construction
-observed: 2026-09-15T15:22:50Z
-commit:   85f51be5d3a9b0ace815922b5db176da259eb6d7
+observed: 2026-09-15T16:32:45Z
+commit:   6aad1045c2f59489c698503595f657d7aead577e
 
 $ grep -nE 'def (resume|unhalt|set_status|set_standard|withdraw)' contracts/stanch.py
 # expect: no output
@@ -14,12 +14,8 @@ $ grep -n 'RUNNING' contracts/stanch.py
 110:        if verdict == EXPLOIT and status_before == RUNNING:
 # exit status 0
 
-$ grep -n 'self.status\[' contracts/stanch.py
-# expect: exactly one RUNNING write in register, one HALTED write in submit_claim
+$ grep -nE 'self\.status\[[^]]*\] = ' contracts/stanch.py
+# expect: exactly two lines, one RUNNING in register and one HALTED in submit_claim
 79:        self.status[registration_key] = RUNNING
-96:        status_before = str(self.status[registration_key])
 111:            self.status[registration_key] = HALTED
-201:                    "statusAfter": str(self.status[key]) if key in self.status else UNKNOWN,
-212:        return str(self.status[registration_key])
-260:                    "status": str(self.status[registration_key])
 # exit status 0

@@ -1,9 +1,9 @@
 {
   "schemaVersion": "stanch.claims/1",
   "project": "STANCH",
-  "updatedAtUtc": "2026-09-15T16:31:50Z",
+  "updatedAtUtc": "2026-09-15T16:32:45Z",
   "revision": {
-    "baseCommit": "fe46cf0f9371a4c526f29a7299a0386f4e6a1861",
+    "baseCommit": "6aad1045c2f59489c698503595f657d7aead577e",
     "branch": "main"
   },
   "network": {
@@ -55,7 +55,7 @@
         "chainId": 61997,
         "probe": "P3"
       },
-      "observedAtUtc": "2026-09-15T16:31:50Z",
+      "observedAtUtc": "2026-09-15T16:32:45Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -76,7 +76,7 @@
         "chainId": 61997,
         "probe": "P2"
       },
-      "observedAtUtc": "2026-09-15T16:31:50Z",
+      "observedAtUtc": "2026-09-15T16:32:45Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -142,7 +142,7 @@
       "scope": {
         "contract": "contracts/stanch.py"
       },
-      "observedAtUtc": "2026-09-15T16:31:50Z",
+      "observedAtUtc": "2026-09-15T16:32:45Z",
       "evidence": [
         "evidence/source-inspection/n1-no-resume.txt"
       ],
@@ -165,7 +165,7 @@
       "scope": {
         "contract": "contracts/stanch.py"
       },
-      "observedAtUtc": "2026-09-15T16:31:50Z",
+      "observedAtUtc": "2026-09-15T16:32:45Z",
       "evidence": [
         "evidence/source-inspection/n2-no-write-path.txt"
       ],
@@ -187,7 +187,7 @@
         "contract": "contracts/stanch.py",
         "chainId": 61997
       },
-      "observedAtUtc": "2026-09-15T16:31:50Z",
+      "observedAtUtc": "2026-09-15T16:32:45Z",
       "evidence": [
         "evidence/source-inspection/n3-no-payable.txt"
       ],
@@ -210,7 +210,7 @@
         "chainId": 61997,
         "gate": "G5"
       },
-      "observedAtUtc": "2026-09-15T16:31:50Z",
+      "observedAtUtc": "2026-09-15T16:32:45Z",
       "evidence": [
         "evidence/studio-next/g5-false-claim.json"
       ],
@@ -233,7 +233,7 @@
         "chainId": 61997,
         "probe": "P5"
       },
-      "observedAtUtc": "2026-09-15T16:31:50Z",
+      "observedAtUtc": "2026-09-15T16:32:45Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -258,7 +258,7 @@
         "chainId": 61997,
         "gate": "G3"
       },
-      "observedAtUtc": "2026-09-15T16:31:50Z",
+      "observedAtUtc": "2026-09-15T16:32:45Z",
       "evidence": [
         "evidence/studio-next/g3-true-halt.json"
       ],
@@ -280,7 +280,7 @@
         "chainId": 61997,
         "gate": "G4"
       },
-      "observedAtUtc": "2026-09-15T16:31:50Z",
+      "observedAtUtc": "2026-09-15T16:32:45Z",
       "evidence": [
         "evidence/studio-next/g4-halted-revert.json"
       ],

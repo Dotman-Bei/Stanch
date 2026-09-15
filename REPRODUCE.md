@@ -44,7 +44,7 @@ grep -nE 'def (resume|unhalt|set_status|set_standard|withdraw)' contracts/stanch
 
 # N1 — every write to the status map. Expect exactly two:
 #      one RUNNING in register, one HALTED in submit_claim.
-grep -n 'self.status\[' contracts/stanch.py
+grep -nE 'self\.status\[[^]]*\] = ' contracts/stanch.py
 
 # N3 — no payable method, no value read. Expect no output from both.
 grep -n 'payable' contracts/stanch.py
