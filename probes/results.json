@@ -1,0 +1,328 @@
+{
+  "schemaVersion": "stanch.probes/1",
+  "network": {
+    "name": "Studio Next",
+    "chainId": 61997,
+    "rpc": "https://studio-next.genlayer.com/api"
+  },
+  "runner": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng",
+  "deployer": "0x11DDE75553F54aE146B9e1FECf319da7b819Eb45",
+  "startedAtUtc": "2026-09-15T14:46:08Z",
+  "probes": {
+    "P3": {
+      "id": "P3",
+      "loadBearing": true,
+      "P3b_view": {
+        "question": "gl.contract.get_at(addr).view().m() inside a view",
+        "returned": "RUNNING",
+        "pass": true
+      },
+      "P3a_write": {
+        "question": "gl.contract.get_at(addr).view().m() inside a write",
+        "tx": {
+          "txHash": "0x9c30d292d60271b6064f434faf4a709228b063955f5352ffa0b2fe1313509374",
+          "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x9c30d292d60271b6064f434faf4a709228b063955f5352ffa0b2fe1313509374",
+          "lifecycle": {
+            "state": "finalized",
+            "outcome": "accepted"
+          },
+          "executionResult": "FINISHED_WITH_RETURN",
+          "consensusResult": "MAJORITY_AGREE",
+          "address": "0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+          "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+          "leaderStatus": "return",
+          "leaderPayload": {
+            "readable": "null"
+          },
+          "votes": {
+            "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "idle",
+            "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "idle",
+            "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree",
+            "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "agree",
+            "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "agree"
+          },
+          "eqOutputs": {}
+        },
+        "governorState": {
+          "child_code_len": 0,
+          "p1_spawned_address": "",
+          "p3_write_result": "READ_OK word=RUNNING",
+          "log": [
+            "P3a READ_OK word=RUNNING"
+          ]
+        },
+        "pass": true
+      },
+      "pass": true
+    },
+    "P2": {
+      "question": "gl.contract.get_at(addr).emit(on=...).method() reaches the callee",
+      "targetBefore": {
+        "label": "p3",
+        "creator": "0x11DDE75553F54aE146B9e1FECf319da7b819Eb45",
+        "async_calls": "0",
+        "last_caller": "",
+        "last_note": ""
+      },
+      "tx": {
+        "txHash": "0xc6f152e965b71c665e55d4d0ee4f8486eedc2896576e38ad46c47cfc75129ff9",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xc6f152e965b71c665e55d4d0ee4f8486eedc2896576e38ad46c47cfc75129ff9",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "executionResult": "FINISHED_WITH_RETURN",
+        "consensusResult": "MAJORITY_AGREE",
+        "address": "0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+        "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+        "leaderStatus": "return",
+        "leaderPayload": {
+          "readable": "null"
+        },
+        "votes": {
+          "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "idle",
+          "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "agree",
+          "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "idle",
+          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "agree",
+          "0xcF5Fd792Df0Dc9d297af75c82B4A0011e8FA1A4A": "agree"
+        },
+        "eqOutputs": {}
+      },
+      "targetAfter": {
+        "label": "p3",
+        "creator": "0x11DDE75553F54aE146B9e1FECf319da7b819Eb45",
+        "async_calls": "1",
+        "last_caller": "0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+        "last_note": "p2 probe"
+      },
+      "waitedSeconds": 45,
+      "pass": true
+    },
+    "P1": {
+      "question": "gl.contract.deploy from inside a contract yields a reachable contract",
+      "setCodeTx": {
+        "txHash": "0x8dc05cf0dda1391ec5a405d7abc22e0e573fd3b33117b3f987d6f57e1b13f536",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x8dc05cf0dda1391ec5a405d7abc22e0e573fd3b33117b3f987d6f57e1b13f536",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "executionResult": "FINISHED_WITH_RETURN",
+        "consensusResult": "MAJORITY_AGREE",
+        "address": "0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+        "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+        "leaderStatus": "return",
+        "leaderPayload": {
+          "readable": "null"
+        },
+        "votes": {
+          "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "idle",
+          "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "agree",
+          "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "idle",
+          "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree",
+          "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "agree"
+        },
+        "eqOutputs": {}
+      },
+      "spawnTx": {
+        "txHash": "0x4f4c76f2ad1db74f90fde454f175402f81d647837c920651be4b61774a4b410a",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x4f4c76f2ad1db74f90fde454f175402f81d647837c920651be4b61774a4b410a",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "executionResult": "FINISHED_WITH_RETURN",
+        "consensusResult": "MAJORITY_AGREE",
+        "address": "0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+        "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+        "leaderStatus": "return",
+        "leaderPayload": {
+          "readable": "null"
+        },
+        "votes": {
+          "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "agree",
+          "0xA793D9dc0ED9edC1f9F732bB68b5D3AFA934F52D": "agree",
+          "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "agree",
+          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "idle",
+          "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "idle"
+        },
+        "eqOutputs": {}
+      },
+      "spawnedAddress": "0xaDc39605305CFA4eA825B96eC44Ce0A9525dA3F9",
+      "pass": true,
+      "spawnedState": "{\"label\": \"p1\", \"creator\": \"0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD\", \"async_calls\": \"0\", \"last_caller\": \"\", \"last_note\": \"\"}",
+      "reachableAfterSeconds": 20,
+      "reachabilityAttempts": [
+        {
+          "afterSeconds": 0,
+          "error": "gen_call failed (code=-32001): Contract 0xaDc39605305CFA4eA825B96eC44Ce0A9525dA3F9 not found"
+        }
+      ]
+    },
+    "P4": {
+      "question": "emit_transfer moves value out of a contract",
+      "governorBalanceBefore": "0",
+      "recipientBalanceBefore": "96875861007999950967",
+      "takeTx": {
+        "txHash": "0xdfcfccdbd40e3ce354e0491483e5bb3b39889cf53d0d33cf9aceda3bf2126ab3",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xdfcfccdbd40e3ce354e0491483e5bb3b39889cf53d0d33cf9aceda3bf2126ab3",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "executionResult": "FINISHED_WITH_RETURN",
+        "consensusResult": "MAJORITY_AGREE",
+        "address": "0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+        "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+        "leaderStatus": "return",
+        "leaderPayload": {
+          "readable": "null"
+        },
+        "votes": {
+          "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "idle",
+          "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "agree",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "idle",
+          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
+          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "agree"
+        },
+        "eqOutputs": {}
+      },
+      "governorBalanceAfterTake": "1000000000000000000",
+      "payInWorked": true,
+      "payOutTx": {
+        "txHash": "0xf258a9b11dd51b7d5cab7f8605d093bdbe1f47116aab9f6eaf434686bc033471",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xf258a9b11dd51b7d5cab7f8605d093bdbe1f47116aab9f6eaf434686bc033471",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "executionResult": "FINISHED_WITH_RETURN",
+        "consensusResult": "MAJORITY_AGREE",
+        "address": "0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+        "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+        "leaderStatus": "return",
+        "leaderPayload": {
+          "readable": "null"
+        },
+        "votes": {
+          "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "idle",
+          "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "agree",
+          "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "agree",
+          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
+          "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "idle"
+        },
+        "eqOutputs": {}
+      },
+      "governorBalanceAfterPay": "1000000000000000000",
+      "recipientBalanceAfter": "95995575887749958850",
+      "governorBalanceAfter90s": "1000000000000000000",
+      "recipientBalanceAfter90s": "95995575887749958850",
+      "governorLog": [
+        "P3a READ_OK word=RUNNING",
+        "P2 EMITTED to=0x4759d015FDbf1825C6536dB983006e03FF54Bc89",
+        "CHILD_CODE_SET len=2471",
+        "P1 SPAWN returned=0xaDc39605305CFA4eA825B96eC44Ce0A9525dA3F9",
+        "P4 TOOK 1000000000000000000",
+        "P4 PAID 0x11DDE75553F54aE146B9e1FECf319da7b819Eb45 500000000000000000"
+      ],
+      "pass": false,
+      "bookkeepingRecordedPayout": true
+    },
+    "P5": {
+      "question": "upgraders list is empty after a plain deploy and upgrade is refused",
+      "rpcAccessorsTried": {
+        "gen_getContractState": "gen_getContractState failed (code=-32601): Method not found: gen_getContractState",
+        "sim_getContractState": "sim_getContractState failed (code=-32601): Method not found: sim_getContractState",
+        "gen_getUpgraders": "gen_getUpgraders failed (code=-32601): Method not found: gen_getUpgraders",
+        "gen_dbg_getContractState": "gen_dbg_getContractState failed (code=-32601): Method not found: gen_dbg_getContractState"
+      },
+      "accessorUsed": "in-VM gl.storage.Root.get(), exposed as Stanch.root_report()",
+      "accessorNote": "No JSON-RPC method on Studio Next returns the root slot. The upgraders list is read from inside the VM instead, which is a stronger observation than an RPC accessor because it is the same storage GenVM itself reads at the start of a write transaction.",
+      "stanchProbeDeploy": {
+        "txHash": "0x9304ebfdde6aa74f8ac87811acbd2065d1ce51194b7652a807d730d01c83d324",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x9304ebfdde6aa74f8ac87811acbd2065d1ce51194b7652a807d730d01c83d324",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "executionResult": "FINISHED_WITH_RETURN",
+        "consensusResult": "MAJORITY_AGREE",
+        "address": "0x76B715403b2BE08d6C9aCE611495DF128b05C59f",
+        "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x76B715403b2BE08d6C9aCE611495DF128b05C59f",
+        "leaderStatus": "return",
+        "leaderPayload": {
+          "readable": "null"
+        },
+        "votes": {
+          "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "agree",
+          "0xA793D9dc0ED9edC1f9F732bB68b5D3AFA934F52D": "idle",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+          "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
+          "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "idle"
+        },
+        "eqOutputs": {}
+      },
+      "rootReport": "{\"code_slot\": \"0\", \"locked_slots_count\": 4, \"permissions\": \"0\", \"upgraders\": [], \"upgraders_count\": 0}",
+      "upgradersEmpty": true,
+      "lockedSlotsCount": 4,
+      "upgradeAttempt": "NOT_ATTEMPTED",
+      "upgradeAttemptReason": "Neither genlayer-py 0.19.0rc2 nor genlayer-js 2.0.0-rc.1 exposes a code upgrade path for Intelligent Contracts, so no upgrade transaction could be constructed to be refused. The second half of N5 is therefore unmeasured and N5 stays PARTIAL.",
+      "pass": null
+    }
+  },
+  "deployments": {
+    "probe_target": {
+      "txHash": "0x5d18f07e2ffb59c5e7abeef1eb5215a11e9823d36b5566a6abaa45a1e8f071bb",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x5d18f07e2ffb59c5e7abeef1eb5215a11e9823d36b5566a6abaa45a1e8f071bb",
+      "lifecycle": {
+        "state": "finalized",
+        "outcome": "accepted"
+      },
+      "executionResult": "FINISHED_WITH_RETURN",
+      "consensusResult": "MAJORITY_AGREE",
+      "address": "0x4759d015FDbf1825C6536dB983006e03FF54Bc89",
+      "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x4759d015FDbf1825C6536dB983006e03FF54Bc89",
+      "leaderStatus": "return",
+      "leaderPayload": {
+        "readable": "null"
+      },
+      "votes": {
+        "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "idle",
+        "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "agree",
+        "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "idle",
+        "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "agree",
+        "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "agree"
+      },
+      "eqOutputs": {}
+    },
+    "probe_governor": {
+      "txHash": "0x22fd21477b3d52c7306fe254fc14b04c714c5cecc246953455b55b1b366de27a",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x22fd21477b3d52c7306fe254fc14b04c714c5cecc246953455b55b1b366de27a",
+      "lifecycle": {
+        "state": "finalized",
+        "outcome": "accepted"
+      },
+      "executionResult": "FINISHED_WITH_RETURN",
+      "consensusResult": "MAJORITY_AGREE",
+      "address": "0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+      "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD",
+      "leaderStatus": "return",
+      "leaderPayload": {
+        "readable": "null"
+      },
+      "votes": {
+        "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "agree",
+        "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "idle",
+        "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "agree",
+        "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
+        "0xcF5Fd792Df0Dc9d297af75c82B4A0011e8FA1A4A": "idle"
+      },
+      "eqOutputs": {}
+    }
+  },
+  "finishedAtUtc": "2026-09-15T14:54:47Z",
+  "explorer": {
+    "probe_target": "https://explorer-studio-dev.genlayer.com/address/0x4759d015FDbf1825C6536dB983006e03FF54Bc89",
+    "probe_governor": "https://explorer-studio-dev.genlayer.com/address/0x09D09df3C23B116B0EB4E285D2B482f3aD34d5FD"
+  }
+}

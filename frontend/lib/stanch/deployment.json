@@ -1,0 +1,10 @@
+{
+  "status": "UNDEPLOYED",
+  "note": "Populated by tools/run_gates.py from evidence/studio-next/deployment.json.",
+  "stanch": null,
+  "cistern": null,
+  "cistern_fixed": null,
+  "injection_target": null,
+  "registrations": {},
+  "gates": {}
+}

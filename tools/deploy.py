@@ -1,0 +1,105 @@
+import json
+import time
+from pathlib import Path
+from typing import Optional
+
+from tools.studio_next import client, explorer_address, explorer_tx
+
+ROOT = Path(__file__).resolve().parent.parent
+
+
+def retry(action, attempts: int = 6, delay: int = 10, label: str = ""):
+    last = None
+    for attempt in range(attempts):
+        try:
+            return action()
+        except Exception as exc:
+            last = exc
+            text = str(exc)
+            transient = any(
+                marker in text
+                for marker in ("502", "Bad gateway", "timed out", "Connection", "not supported on this chain")
+            )
+            if not transient or attempt == attempts - 1:
+                raise
+            print(f"   retry {label or 'rpc'} after {text[:90]}")
+            time.sleep(delay * (attempt + 1))
+    raise last
+
+
+def deploy(gl, source: Path, args: Optional[list] = None) -> dict:
+    fees = retry(lambda: gl.estimate_transaction_fees(), label="fee estimate")
+    tx = retry(
+        lambda: gl.deploy_contract(code=source.read_bytes(), args=args or [], fees=fees),
+        label="deploy",
+    )
+    receipt = retry(
+        lambda: gl.wait_for_transaction_receipt(
+            transaction_hash=tx, wait_until="finalized", retries=200, interval=4
+        ),
+        label="deploy receipt",
+    )
+    return summarize(receipt, tx)
+
+
+def call(gl, address: str, method: str, args: Optional[list] = None, value: int = 0) -> dict:
+    fees = estimate_fees_for(gl, address, method, args, value)
+    tx = retry(
+        lambda: gl.write_contract(
+            address=address, function_name=method, args=args or [], value=value, fees=fees
+        ),
+        label=f"write {method}",
+    )
+    receipt = retry(
+        lambda: gl.wait_for_transaction_receipt(
+            transaction_hash=tx, wait_until="finalized", retries=200, interval=4
+        ),
+        label=f"receipt {method}",
+    )
+    return summarize(receipt, tx)
+
+
+def estimate_fees_for(gl, address: str, method: str, args: Optional[list], value: int) -> dict:
+    try:
+        return retry(
+            lambda: gl.estimate_transaction_fees_for_write(
+                address=address, function_name=method, args=args or [], value=value
+            ),
+            label=f"fee estimate {method}",
+        )
+    except Exception:
+        return retry(lambda: gl.estimate_transaction_fees(), label="fee estimate fallback")
+
+
+def read(gl, address: str, method: str, args: Optional[list] = None):
+    return retry(
+        lambda: gl.read_contract(address=address, function_name=method, args=args or []),
+        attempts=4,
+        delay=6,
+        label=f"read {method}",
+    )
+
+
+def summarize(receipt: dict, tx_hash: str) -> dict:
+    consensus = receipt.get("consensus_data") or {}
+    leader = (consensus.get("leader_receipt") or [{}])[0]
+    return {
+        "txHash": tx_hash,
+        "explorer": explorer_tx(tx_hash),
+        "lifecycle": receipt.get("lifecycle"),
+        "executionResult": receipt.get("txExecutionResultName"),
+        "consensusResult": receipt.get("result_name"),
+        "address": receipt.get("to_address"),
+        "addressExplorer": explorer_address(receipt.get("to_address") or ""),
+        "leaderStatus": (leader.get("result") or {}).get("status"),
+        "leaderPayload": (leader.get("result") or {}).get("payload"),
+        "votes": consensus.get("votes"),
+        "eqOutputs": leader.get("eq_outputs"),
+    }
+
+
+def write_evidence(name: str, payload: dict) -> Path:
+    path = ROOT / "evidence" / "studio-next" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, default=str) + "\n")
+    return path

@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-blue: #0038ff;
+  --color-brand-dark: #001a99;
+  --color-brand-volt: #ccff00;
+  --color-brand-canvas: #f8f9fa;
+  --color-brand-black: #000000;
+  --color-brand-white: #ffffff;
+
+  --radius-3xl: 1.75rem;
+  --radius-4xl: 2.5rem;
+  --radius-5xl: 3.5rem;
+
+  --shadow-brutal-sm: 4px 4px 0px #000000;
+  --shadow-brutal: 6px 6px 0px #000000;
+  --shadow-brutal-lg: 8px 8px 0px #001a99;
+  --shadow-brutal-volt: 5px 5px 0px #ccff00;
+  --shadow-frost: 0 20px 50px rgba(0, 56, 255, 0.25);
+
+  --font-display: "Arial Black", "Arial Bold", Impact, system-ui, sans-serif;
+  --font-sans: Inter, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --animate-spin-slow: spin 12s linear infinite;
+  --animate-float-slow: float 5s ease-in-out infinite;
+  --animate-float-delayed: float 6s ease-in-out infinite 1s;
+  --animate-marquee: marquee 38s linear infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-18px);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: #0038ff;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 0.92;
+}
+
+.extrude {
+  text-shadow:
+    1px 1px 0 #001a99, 2px 2px 0 #001a99, 3px 3px 0 #001a99, 4px 4px 0 #001a99,
+    5px 5px 0 #001a99, 6px 6px 0 #001a99, 7px 7px 0 #001a99, 8px 8px 0 #001a99,
+    9px 9px 0 #001a99, 10px 10px 0 #001a99, 11px 11px 0 #001a99,
+    12px 12px 0 #001a99, 13px 13px 0 #001a99, 14px 14px 0 #001a99;
+}
+
+.extrude-sm {
+  text-shadow:
+    1px 1px 0 #001a99, 2px 2px 0 #001a99, 3px 3px 0 #001a99, 4px 4px 0 #001a99,
+    5px 5px 0 #001a99, 6px 6px 0 #001a99;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+.frost {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+::selection {
+  background: #ccff00;
+  color: #000000;
+}
+
+body::-webkit-scrollbar {
+  width: 12px;
+}
+body::-webkit-scrollbar-track {
+  background: #001a99;
+}
+body::-webkit-scrollbar-thumb {
+  background: #ccff00;
+  border: 2px solid #000000;
+}
