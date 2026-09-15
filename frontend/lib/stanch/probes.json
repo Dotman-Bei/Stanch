@@ -1,0 +1,31 @@
+{
+  "network": {
+    "name": "Studio Next",
+    "chainId": 61997,
+    "rpc": "https://studio-next.genlayer.com/api"
+  },
+  "runner": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng",
+  "finishedAtUtc": "2026-09-15T14:54:47Z",
+  "probes": {
+    "P3": {
+      "question": "contract-to-contract synchronous view, in a view and in a write",
+      "pass": true
+    },
+    "P2": {
+      "question": "gl.contract.get_at(addr).emit(on=...).method() reaches the callee",
+      "pass": true
+    },
+    "P1": {
+      "question": "gl.contract.deploy from inside a contract yields a reachable contract",
+      "pass": true
+    },
+    "P4": {
+      "question": "emit_transfer moves value out of a contract",
+      "pass": false
+    },
+    "P5": {
+      "question": "upgraders list is empty after a plain deploy and upgrade is refused",
+      "pass": null
+    }
+  }
+}

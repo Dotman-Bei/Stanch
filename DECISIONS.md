@@ -267,3 +267,103 @@ The second half of N5 could not be measured. Neither `genlayer-py 0.19.0rc2` nor
 there is no upgrade transaction to be refused. **N5 is therefore `PARTIAL`, not
 `SUPPORTED`,** and its limitations say so. An immutability claim with half its
 evidence missing is worse than no immutability claim.
+
+## D-007 — A cross-contract read cannot happen inside an equivalence block
+
+**Believed.** PRD §12, Stage 1: *"pin the reading, under `gl.eq_principle.strict_eq`.
+Read the target's public view surface according to `reading_spec`."* The first
+implementation did exactly that: the callable passed to `strict_eq` opened a
+proxy with `gl.contract.get_at(...).view()` and called the target's methods.
+
+**Observed.** Every reading came back `READ_FAILED`:
+
+```json
+"readings": {"published_invariant": "READ_FAILED",
+             "total_claimable_units": "READ_FAILED",
+             "total_deposited_units": "READ_FAILED"}
+```
+
+A four-variant probe deployed on Studio Next isolated it. The same read, against
+the same live CISTERN, in the same contract:
+
+| Variant | Where the read happens | Result |
+|---|---|---|
+| `v1_direct_static` | write body, `view.total_deposited_units()` | `1000` |
+| `v2_direct_getattr` | write body, `getattr(view, name)()` | `1000` |
+| `v3_inside_strict_eq` | inside `strict_eq`, static attribute | `FINISHED_WITH_ERROR`, `exit_code 1` |
+| `v4_inside_strict_eq_getattr` | inside `strict_eq`, dynamic attribute | `FINISHED_WITH_ERROR`, `exit_code 1` |
+
+Dynamic attribute lookup is not the problem; both direct forms work. The
+equivalence block is. `strict_eq` runs its callable through
+`vm.spawn_sandbox(fn)` on each validator, and that sandbox has no chain-call
+capability, so the proxy call aborts the whole transaction.
+
+**Decided.** The cross-contract read moves out of the equivalence block and into
+the deterministic body of `submit_claim`. `strict_eq` is dropped from Stage 1
+entirely rather than replaced.
+
+**Why this keeps the property §12 was asking for.** The purpose of Stage 1 is
+that the reading is fixed, agreed, and unforgeable before any model sees it.
+Ordinary deterministic execution already delivers that on GenLayer: every
+validator re-executes `submit_claim` including the view call, and any
+disagreement about those bytes fails consensus before a verdict is reached.
+`strict_eq` would have added a second, redundant agreement step over a value that
+is already consensus-critical. The pinned bytes are held in a local and only that
+local enters the non-deterministic block, which is the invariant §12 actually
+names: *"Storage is copied to memory before entering any non-deterministic block."*
+
+**What this cost.** The first gate run recorded G5 as a failure and G6 as a pass,
+and both were wrong. G5's false claim returned `INDETERMINATE` rather than
+`CLEAR` — correct behaviour for a reading full of `READ_FAILED` under standard
+rule 3, but not the refusal G5 exists to demonstrate. G6 returned
+`INDETERMINATE` for the right word and the wrong reason: its reading spec names a
+method the target does not expose, but *every* method was failing, so the gate
+would have passed no matter what it asked for. Both gates were re-run after the
+fix. A gate that passes for a reason you did not test is not a passing gate.
+
+## D-008 — An ungatherable reading is decided deterministically, not by the classifier
+
+**Observed.** With D-007's fix in place, G3, G4 and G5 all passed on the first run.
+G6 did not. Its claim names a view method the target does not expose, so the
+reading was:
+
+```json
+"readings": {"oracle_price_feed_history": "READ_FAILED"}
+```
+
+against the pattern *"the oracle price feed has been manipulated"*. The standard's
+rule 3 said to answer `INDETERMINATE` when a reading records an error. Validators
+agreed on `CLEAR` instead. They were not wrong on their own terms — nothing in the
+reading supported the pattern — but `CLEAR` in this system means *"the numbers are
+consistent with the invariant the target publishes"*, and here there were no
+numbers at all. That is a false all-clear, which is the exact failure STANCH
+exists to avoid.
+
+**Decided.** The precondition is no longer a request to the model. `submit_claim`
+now checks the pinned reading itself, before any classifier runs:
+
+```
+_reading_defect(reading) -> ""            proceed to classification
+                         -> "READ_FAILED:<method>"
+                         -> "READING_SPEC_NOT_JSON"
+                         -> "READING_SPEC_NO_METHODS"
+                         -> "READING_EMPTY"
+                         -> "READING_NOT_PARSEABLE"
+```
+
+Any non-empty result records the claim as `INDETERMINATE` with that string as its
+note, and no model is consulted. Rule 3 stays in the standard as a backstop for
+readings that are gatherable but uninformative.
+
+**Why this is better than a firmer prompt.** Whether a reading was gathered is a
+deterministic fact about bytes STANCH already holds. Asking a language model to
+re-derive it spends a consensus round on a question with a computable answer and
+introduces a class of error that has no upside. It also makes the distinction
+§12 insists on — that `INDETERMINATE` is never collapsed into `CLEAR` — a property
+of the code rather than a hope about a prompt. The narrowing is published here, as
+PRD §17 K2 requires.
+
+**Scope of what is still model-decided.** Exactly one thing: given a complete
+reading of real values, does it show the asserted condition holding now. That is
+the judgment §2 argues cannot be written as a deterministic predicate in advance.
+Everything around it is deterministic.

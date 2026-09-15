@@ -1,0 +1,31 @@
+{
+  "gate": "G4",
+  "statusSeenByTarget": "HALTED",
+  "observedAtUtc": "2026-09-15T15:20:28Z",
+  "depositTx": {
+    "txHash": "0xfc8b4d0a3cf3b67adec49809998cd18f99c39828ed859c31c5733cb7a92e6197",
+    "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xfc8b4d0a3cf3b67adec49809998cd18f99c39828ed859c31c5733cb7a92e6197",
+    "lifecycle": {
+      "state": "finalized",
+      "outcome": "accepted"
+    },
+    "executionResult": "FINISHED_WITH_ERROR",
+    "consensusResult": "MAJORITY_AGREE",
+    "address": "0x4109BC36B3178322D1a720b3FEbe8a81AFBdBD72",
+    "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x4109BC36B3178322D1a720b3FEbe8a81AFBdBD72",
+    "leaderStatus": "rollback",
+    "leaderPayload": "STANCH_HALTED",
+    "votes": {
+      "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "idle",
+      "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "agree",
+      "0xA793D9dc0ED9edC1f9F732bB68b5D3AFA934F52D": "idle",
+      "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+      "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree"
+    },
+    "eqOutputs": {}
+  },
+  "reverted": true,
+  "leaderPayload": "STANCH_HALTED",
+  "vaultReportAfter": "{\"accrual_calls\": \"1\", \"excess_claimable\": \"250\", \"invariant\": \"total_claimable must never exceed total_deposited\", \"stanch\": \"0x6012505Dda1Ee7a105C7949778D8Bb800bAA5462\", \"stanch_key\": \"cistern-demo\", \"total_claimable\": \"1250\", \"total_deposited\": \"1000\"}",
+  "pass": true
+}

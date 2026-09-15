@@ -1,10 +1,186 @@
 {
-  "status": "UNDEPLOYED",
-  "note": "Populated by tools/run_gates.py from evidence/studio-next/deployment.json.",
-  "stanch": null,
-  "cistern": null,
-  "cistern_fixed": null,
-  "injection_target": null,
-  "registrations": {},
-  "gates": {}
+  "stanch": {
+    "txHash": "0x0b64995f59ff9279ec405cfa9e43c908c91f4e1361348dd20670db5657b04bc1",
+    "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x0b64995f59ff9279ec405cfa9e43c908c91f4e1361348dd20670db5657b04bc1",
+    "lifecycle": {
+      "state": "finalized",
+      "outcome": "accepted"
+    },
+    "executionResult": "FINISHED_WITH_RETURN",
+    "consensusResult": "MAJORITY_AGREE",
+    "address": "0xAC3c4EdB00FEfafAA99EE9e8f7EDdaB3956CA90c",
+    "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0xAC3c4EdB00FEfafAA99EE9e8f7EDdaB3956CA90c",
+    "leaderStatus": "return",
+    "leaderPayload": {
+      "readable": "null"
+    },
+    "votes": {
+      "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "agree",
+      "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "idle",
+      "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "agree",
+      "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "idle",
+      "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree"
+    },
+    "eqOutputs": {}
+  },
+  "cistern": {
+    "txHash": "0xb4ee8dd2343fad6282adfc85eb808f70c5b418e5d0bc6f4a9263e6caaca9cf31",
+    "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xb4ee8dd2343fad6282adfc85eb808f70c5b418e5d0bc6f4a9263e6caaca9cf31",
+    "lifecycle": {
+      "state": "finalized",
+      "outcome": "accepted"
+    },
+    "executionResult": "FINISHED_WITH_RETURN",
+    "consensusResult": "MAJORITY_AGREE",
+    "address": "0x080750c9f2D740ed361A024f9C96359e73571139",
+    "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x080750c9f2D740ed361A024f9C96359e73571139",
+    "leaderStatus": "return",
+    "leaderPayload": {
+      "readable": "null"
+    },
+    "votes": {
+      "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "agree",
+      "0xa0435f618c1F27B254998018AEa8Da5C77187852": "idle",
+      "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "idle",
+      "0xcF5Fd792Df0Dc9d297af75c82B4A0011e8FA1A4A": "agree",
+      "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "agree"
+    },
+    "eqOutputs": {}
+  },
+  "cistern_fixed": {
+    "txHash": "0x587d97af36a63725f363b8a3c3cd14ec3885048eecdd40c10fa994d9d09178a3",
+    "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x587d97af36a63725f363b8a3c3cd14ec3885048eecdd40c10fa994d9d09178a3",
+    "lifecycle": {
+      "state": "finalized",
+      "outcome": "accepted"
+    },
+    "executionResult": "FINISHED_WITH_RETURN",
+    "consensusResult": "MAJORITY_AGREE",
+    "address": "0xd9203d28D9D9df992835Bc7E42d64334bb85D011",
+    "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0xd9203d28D9D9df992835Bc7E42d64334bb85D011",
+    "leaderStatus": "return",
+    "leaderPayload": {
+      "readable": "null"
+    },
+    "votes": {
+      "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "agree",
+      "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "agree",
+      "0xa0435f618c1F27B254998018AEa8Da5C77187852": "idle",
+      "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "agree",
+      "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "idle"
+    },
+    "eqOutputs": {}
+  },
+  "injection_target": {
+    "txHash": "0x5f65a8a2652ab4e47d6920e2fd82d5a9e9b202cb3c34a72a4e27dbbf70506e29",
+    "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x5f65a8a2652ab4e47d6920e2fd82d5a9e9b202cb3c34a72a4e27dbbf70506e29",
+    "lifecycle": {
+      "state": "finalized",
+      "outcome": "accepted"
+    },
+    "executionResult": "FINISHED_WITH_RETURN",
+    "consensusResult": "MAJORITY_AGREE",
+    "address": "0x333d75B7d5d9DEeEF592E924bA15cd8599Fafe51",
+    "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x333d75B7d5d9DEeEF592E924bA15cd8599Fafe51",
+    "leaderStatus": "return",
+    "leaderPayload": {
+      "readable": "null"
+    },
+    "votes": {
+      "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "agree",
+      "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "idle",
+      "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+      "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "idle",
+      "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "agree"
+    },
+    "eqOutputs": {}
+  },
+  "updatedAtUtc": "2026-09-15T14:59:29Z",
+  "registrations": {
+    "cistern-demo": {
+      "tx": {
+        "txHash": "0x961ce43989857e8c751f7e94a9944eb30a4a7496d75d37a190991b1aab4bf4e4",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x961ce43989857e8c751f7e94a9944eb30a4a7496d75d37a190991b1aab4bf4e4",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "executionResult": "FINISHED_WITH_RETURN",
+        "consensusResult": "MAJORITY_AGREE",
+        "address": "0xAC3c4EdB00FEfafAA99EE9e8f7EDdaB3956CA90c",
+        "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0xAC3c4EdB00FEfafAA99EE9e8f7EDdaB3956CA90c",
+        "leaderStatus": "return",
+        "leaderPayload": {
+          "readable": "null"
+        },
+        "votes": {
+          "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "agree",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+          "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree",
+          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "idle",
+          "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "idle"
+        },
+        "eqOutputs": {}
+      },
+      "statusAfter": "RUNNING",
+      "target": "0x080750c9f2D740ed361A024f9C96359e73571139"
+    },
+    "cistern-fixed-control": {
+      "tx": {
+        "txHash": "0x58a7b5956b347a547270559618b1bad2f718a7ba10e8c0a2e7a624deeeb8c983",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x58a7b5956b347a547270559618b1bad2f718a7ba10e8c0a2e7a624deeeb8c983",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "executionResult": "FINISHED_WITH_RETURN",
+        "consensusResult": "MAJORITY_AGREE",
+        "address": "0xAC3c4EdB00FEfafAA99EE9e8f7EDdaB3956CA90c",
+        "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0xAC3c4EdB00FEfafAA99EE9e8f7EDdaB3956CA90c",
+        "leaderStatus": "return",
+        "leaderPayload": {
+          "readable": "null"
+        },
+        "votes": {
+          "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "idle",
+          "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "agree",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "idle",
+          "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree",
+          "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "agree"
+        },
+        "eqOutputs": {}
+      },
+      "statusAfter": "RUNNING",
+      "target": "0xd9203d28D9D9df992835Bc7E42d64334bb85D011"
+    },
+    "injection-target": {
+      "tx": {
+        "txHash": "0x66f78b90e13759d9d13d7bd3967b39312bab42e642a5bb5e3cdbc89b826ef59e",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x66f78b90e13759d9d13d7bd3967b39312bab42e642a5bb5e3cdbc89b826ef59e",
+        "lifecycle": {
+          "state": "finalized",
+          "outcome": "accepted"
+        },
+        "executionResult": "FINISHED_WITH_RETURN",
+        "consensusResult": "MAJORITY_AGREE",
+        "address": "0xAC3c4EdB00FEfafAA99EE9e8f7EDdaB3956CA90c",
+        "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0xAC3c4EdB00FEfafAA99EE9e8f7EDdaB3956CA90c",
+        "leaderStatus": "return",
+        "leaderPayload": {
+          "readable": "null"
+        },
+        "votes": {
+          "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "idle",
+          "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "agree",
+          "0xA793D9dc0ED9edC1f9F732bB68b5D3AFA934F52D": "agree",
+          "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "idle"
+        },
+        "eqOutputs": {}
+      },
+      "statusAfter": "RUNNING",
+      "target": "0x333d75B7d5d9DEeEF592E924bA15cd8599Fafe51"
+    }
+  },
+  "status": "LIVE"
 }

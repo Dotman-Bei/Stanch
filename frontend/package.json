@@ -1,7 +1,7 @@
 {
-  "name": "genlayer-football-betting",
+  "name": "stanch-frontend",
   "version": "1.0.0",
-  "description": "GenLayer Football Betting - AI-powered prediction betting on GenLayer blockchain.",
+  "description": "STANCH - halt authority with no write access to anything it halts. Registry, claim submission, verdict records and proof room on GenLayer Studio Next.",
   "main": "index.js",
   "scripts": {
     "dev": "next dev",

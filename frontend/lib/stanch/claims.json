@@ -1,0 +1,258 @@
+{
+  "schemaVersion": "stanch.claims/1",
+  "project": "STANCH",
+  "updatedAtUtc": "2026-09-15T00:00:00Z",
+  "revision": {
+    "baseCommit": "UNSET",
+    "branch": "main"
+  },
+  "network": {
+    "name": "Studio Next",
+    "chainId": 61997,
+    "rpc": "https://studio-next.genlayer.com/api",
+    "explorer": "https://explorer-studio-dev.genlayer.com/"
+  },
+  "readMe": [
+    "Every public claim STANCH makes, with its status, the class of evidence behind it, where that evidence lives, and what it does not prove.",
+    "Status and evidence class are independent axes. Status is how much of the claim the evidence supports. Evidence class is what kind of observation produced it.",
+    "Partial evidence is described in the row and never raises its status.",
+    "A claim may not be promoted above UNMEASURED until the file named in evidence[] exists in this repository.",
+    "The negation belongs inside the claim sentence, not in a footnote."
+  ],
+  "statusDefinitions": {
+    "SUPPORTED": "The listed evidence supports the claim within its stated scope.",
+    "PARTIAL": "The listed evidence supports only part of the claim; limitations identify the unsupported portion.",
+    "UNMEASURED": "No observation or test currently supports the claim.",
+    "NOT_CLAIMED": "The capability is explicitly outside the current submission claim set."
+  },
+  "evidenceClassDefinitions": {
+    "studio_next_observation": "A time-bound read or interaction on Studio Next, chain 61997.",
+    "consensus_receipt": "A finalized GenLayer transaction whose validators independently agreed on a non-deterministic result under an equivalence principle.",
+    "local_test": "A deterministic result from the GenLayer testing suite against a local or simulated validator set. Not network evidence.",
+    "source_inspection": "A property established by reading committed source, reproducible by a stated grep.",
+    "synthetic_fixture": "A deterministic result produced from controlled fixture data.",
+    "publisher_claim": "A statement or status returned by our own service or interface, about itself."
+  },
+  "standingCaveats": [
+    "All work runs on Studio Next with valueless test tokens. No amount recorded here is money.",
+    "Nothing here is an audit, a production-readiness claim, or a third-party endorsement.",
+    "STANCH is opt-in and pull-based. It cannot halt a contract that was not written to read it.",
+    "STANCH reads current state only. An exploit that has completed and left no readable trace cannot be halted.",
+    "A refusal observed through a read call is not a mined reverted transaction, and rows say which was observed.",
+    "Validator agreement on a classification is agreement, not correctness."
+  ],
+  "claims": [
+    {
+      "id": "P3-SYNC-CROSS-CONTRACT-VIEW",
+      "claim": "A GenLayer Intelligent Contract on Studio Next can synchronously read another Intelligent Contract through gl.get_contract_at(addr).view(), both inside a write transaction and inside a view call.",
+      "status": "UNMEASURED",
+      "evidenceClasses": [],
+      "scope": { "chainId": 61997, "probe": "P3" },
+      "observedAtUtc": null,
+      "evidence": ["probes/results.json"],
+      "reproduce": "See probes/PROBE.md, probe P3",
+      "limitations": [
+        "The entire STANCH architecture depends on this single capability. If it fails, see PRD section 17, K1.",
+        "Upstream issue genvm-manager#20 reports synchronous reads are healthy on chain 4221, but exercised EOA-to-contract reads rather than contract-to-contract."
+      ]
+    },
+    {
+      "id": "P2-ASYNC-EMIT-EXECUTION",
+      "claim": "On Studio Next, an asynchronous message emitted by an Intelligent Contract through gl.get_contract_at(addr).emit() either does or does not reach the callee; this row records which, and does not assert that STANCH depends on it either way.",
+      "status": "UNMEASURED",
+      "evidenceClasses": [],
+      "scope": { "chainId": 61997, "probe": "P2" },
+      "observedAtUtc": null,
+      "evidence": ["probes/results.json"],
+      "reproduce": "See probes/PROBE.md, probe P2",
+      "limitations": [
+        "Upstream issue genvm-manager#20 reports this path is broken on chain 4221 and was still open and unassigned as of 15 September 2026.",
+        "A pass on Studio Next does not mean the upstream defect is fixed on other networks.",
+        "STANCH chose the pull architecture regardless of this result. See DECISIONS.md D1."
+      ]
+    },
+    {
+      "id": "N1-NO-RESUME",
+      "claim": "STANCH cannot resume a halted target. No method sets a status back to RUNNING, and no code path writes RUNNING after construction; this is a property of the committed source, not a permission check that an operator could bypass.",
+      "status": "UNMEASURED",
+      "evidenceClasses": [],
+      "scope": { "contract": "contracts/stanch.py" },
+      "observedAtUtc": null,
+      "evidence": [
+        "evidence/source-inspection/n1-no-resume.txt",
+        "tests/test_no_resume.py"
+      ],
+      "reproduce": "grep -n 'RUNNING' contracts/stanch.py && gltest tests/test_no_resume.py",
+      "limitations": [
+        "Establishes the absence of a resume path in this version of the source, not across future versions.",
+        "Does not prevent a target from ignoring a HALTED verdict; enforcement is the target's own guard clause.",
+        "Not a formal verification."
+      ]
+    },
+    {
+      "id": "N2-NO-WRITE-PATH",
+      "claim": "STANCH has no write path to any contract it can halt. The symbols .emit(, emit_transfer, gl.deploy_contract and gl.evm.contract_interface appear nowhere in contracts/stanch.py.",
+      "status": "UNMEASURED",
+      "evidenceClasses": [],
+      "scope": { "contract": "contracts/stanch.py" },
+      "observedAtUtc": null,
+      "evidence": ["evidence/source-inspection/n2-no-write-path.txt"],
+      "reproduce": "grep -nE '\\.emit\\(|emit_transfer|deploy_contract|contract_interface' contracts/stanch.py",
+      "limitations": [
+        "A grep over committed source, not a VM-level capability proof.",
+        "Covers contracts/stanch.py only. The frontend and tests are separately scoped.",
+        "Does not establish that the GenVM would refuse such a write if it were added."
+      ]
+    },
+    {
+      "id": "N3-NO-VALUE-CUSTODY",
+      "claim": "STANCH never takes custody of value. No payable method exists on the contract and its observed balance is zero.",
+      "status": "UNMEASURED",
+      "evidenceClasses": [],
+      "scope": { "contract": "contracts/stanch.py", "chainId": 61997 },
+      "observedAtUtc": null,
+      "evidence": [
+        "evidence/source-inspection/n3-no-payable.txt",
+        "evidence/studio-next/stanch-balance.json"
+      ],
+      "reproduce": "grep -n 'payable' contracts/stanch.py && see REPRODUCE.md, balance read",
+      "limitations": [
+        "A balance read is a point-in-time observation, not a guarantee about future blocks.",
+        "The ghost contract on the EVM layer is a separate surface and is not covered by this row."
+      ]
+    },
+    {
+      "id": "N4-FALSE-CLAIM-REFUSED",
+      "claim": "A submitted claim whose pinned reading does not support the asserted pattern returns CLEAR and does not halt the target; the target was still RUNNING after the verdict.",
+      "status": "UNMEASURED",
+      "evidenceClasses": [],
+      "scope": { "chainId": 61997, "gate": "G5" },
+      "observedAtUtc": null,
+      "evidence": ["evidence/studio-next/g5-false-claim.json"],
+      "reproduce": "See REPRODUCE.md, gate G5",
+      "limitations": [
+        "One refused claim is one observation, not a measured false-positive rate.",
+        "The refusal was produced by the classifier under the standard fixed in code; a differently worded false claim may not be refused.",
+        "No adversarial sweep over claim phrasings has been run. See PRD section 20."
+      ]
+    },
+    {
+      "id": "N5-STANDARD-IMMUTABLE",
+      "claim": "The classification standard cannot be changed by anyone, including the deployer, because STANCH deployed with an empty upgraders list and its code slot is locked from the end of construction.",
+      "status": "UNMEASURED",
+      "evidenceClasses": [],
+      "scope": { "chainId": 61997, "probe": "P5" },
+      "observedAtUtc": null,
+      "evidence": [
+        "evidence/studio-next/p5-upgraders-empty.json",
+        "evidence/studio-next/p5-upgrade-refused.json"
+      ],
+      "reproduce": "See probes/PROBE.md, probe P5",
+      "limitations": [
+        "Rests on documented GenVM upgradability semantics that must be confirmed by observation, not assumed.",
+        "Immutability of the standard is not immutability of the classifier; validator model behaviour is outside this claim.",
+        "Does not establish that the standard is correct, only that it cannot be changed."
+      ]
+    },
+    {
+      "id": "G3-TRUE-HALT-ON-CONSENSUS",
+      "claim": "A claim pointing at a genuinely violated invariant in CISTERN returned EXPLOIT under validator consensus and flipped the registered status to HALTED in a finalized transaction.",
+      "status": "UNMEASURED",
+      "evidenceClasses": [],
+      "scope": { "chainId": 61997, "gate": "G3" },
+      "observedAtUtc": null,
+      "evidence": ["evidence/studio-next/g3-true-halt.json"],
+      "reproduce": "See REPRODUCE.md, gate G3",
+      "limitations": [
+        "CISTERN's defect was authored by us for demonstration; this is not detection of an unknown exploit in an unfamiliar contract.",
+        "Validator agreement is agreement, not correctness.",
+        "One halt is one observation, not a measured detection rate."
+      ]
+    },
+    {
+      "id": "G4-TARGET-SELF-ENFORCES",
+      "claim": "After the status flip, a CISTERN state-changing call reverted with STANCH_HALTED, and the refusal was produced by CISTERN reading STANCH, not by STANCH writing to CISTERN.",
+      "status": "UNMEASURED",
+      "evidenceClasses": [],
+      "scope": { "chainId": 61997, "gate": "G4" },
+      "observedAtUtc": null,
+      "evidence": ["evidence/studio-next/g4-halted-revert.json"],
+      "reproduce": "See REPRODUCE.md, gate G4",
+      "limitations": [
+        "Demonstrates enforcement in a target we wrote to cooperate. An uncooperative target is unprotected by design.",
+        "Records whether the refusal was a mined revert or a read-call failure; these are not the same evidence."
+      ]
+    },
+    {
+      "id": "G6-INDETERMINATE-DISTINCT",
+      "claim": "An insufficient claim returned INDETERMINATE, changed no state, and is displayed in the interface as neither a pass nor a fail.",
+      "status": "UNMEASURED",
+      "evidenceClasses": [],
+      "scope": { "chainId": 61997, "gate": "G6" },
+      "observedAtUtc": null,
+      "evidence": ["evidence/studio-next/g6-indeterminate.json"],
+      "reproduce": "See REPRODUCE.md, gate G6",
+      "limitations": [
+        "One observation. No rate of indeterminate outcomes has been measured.",
+        "Display behaviour is a publisher_claim about our own interface until independently checked."
+      ]
+    },
+    {
+      "id": "INJECTION-RESISTANCE",
+      "claim": "A claim whose prose asserts an exploit while its pinned reading shows a healthy invariant returned CLEAR, and a reading containing instruction-shaped text did not produce EXPLOIT.",
+      "status": "UNMEASURED",
+      "evidenceClasses": [],
+      "scope": { "campaign": "PRD section 20" },
+      "observedAtUtc": null,
+      "evidence": ["evidence/studio-next/campaign-injection.json"],
+      "reproduce": "See REPRODUCE.md, adversarial campaign",
+      "limitations": [
+        "Two payloads is not a sweep. No systematic injection corpus has been run.",
+        "Absence of a successful injection within this budget is not evidence of resistance; it is NO_WITNESS_WITHIN_BUDGET.",
+        "Any payload that did succeed is recorded here and in the README rather than removed."
+      ]
+    },
+    {
+      "id": "BOND-SLASHING",
+      "claim": "Claim submission requires a slashable bond in GEN.",
+      "status": "NOT_CLAIMED",
+      "evidenceClasses": [],
+      "scope": {},
+      "observedAtUtc": null,
+      "evidence": [],
+      "reproduce": null,
+      "limitations": [
+        "Deliberately out of scope. Upstream issue genvm-manager#20 reports that value can be paid into a contract and not out, which would strand any bond.",
+        "STANCH takes no custody of value in this version. See PRD section 16."
+      ]
+    },
+    {
+      "id": "UNKNOWN-EXPLOIT-DETECTION",
+      "claim": "STANCH detects exploits in contracts it has not seen before.",
+      "status": "NOT_CLAIMED",
+      "evidenceClasses": [],
+      "scope": {},
+      "observedAtUtc": null,
+      "evidence": [],
+      "reproduce": null,
+      "limitations": [
+        "Deliberately out of scope. STANCH classifies a reading a claimant specifies, against a fixed standard. It does not monitor, scan or discover.",
+        "The demo target's defect was authored by us."
+      ]
+    },
+    {
+      "id": "PRODUCTION-READINESS",
+      "claim": "STANCH is safe to place in the path of a live protocol.",
+      "status": "NOT_CLAIMED",
+      "evidenceClasses": [],
+      "scope": {},
+      "observedAtUtc": null,
+      "evidence": [],
+      "reproduce": null,
+      "limitations": [
+        "No audit. No mainnet deployment. Studio Next only.",
+        "A guard clause that reads an external contract on every write adds a failure mode: if STANCH is unreachable, the target must decide whether to fail open or closed, and that decision is the target's, not ours."
+      ]
+    }
+  ]
+}

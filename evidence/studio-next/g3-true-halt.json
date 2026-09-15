@@ -1,0 +1,43 @@
+{
+  "gate": "G3",
+  "vaultReportBefore": "{\"accrual_calls\": \"1\", \"excess_claimable\": \"250\", \"invariant\": \"total_claimable must never exceed total_deposited\", \"stanch\": \"0x6012505Dda1Ee7a105C7949778D8Bb800bAA5462\", \"stanch_key\": \"cistern-demo\", \"total_claimable\": \"1250\", \"total_deposited\": \"1000\"}",
+  "readingSpec": "{\"methods\": [\"vault_report\"]}",
+  "pattern": "total_claimable exceeds total_deposited, so the vault currently owes more units than were ever put into it",
+  "statusBefore": "RUNNING",
+  "observedAtUtc": "2026-09-15T15:19:37Z",
+  "tx": {
+    "txHash": "0x7d315c996e01eb8475c33079a74191a13ff8d27cf5c0a8c399bec46c1e3f2f4a",
+    "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x7d315c996e01eb8475c33079a74191a13ff8d27cf5c0a8c399bec46c1e3f2f4a",
+    "lifecycle": {
+      "state": "finalized",
+      "outcome": "accepted"
+    },
+    "executionResult": "FINISHED_WITH_RETURN",
+    "consensusResult": "MAJORITY_AGREE",
+    "address": "0x6012505Dda1Ee7a105C7949778D8Bb800bAA5462",
+    "addressExplorer": "https://explorer-studio-dev.genlayer.com/address/0x6012505Dda1Ee7a105C7949778D8Bb800bAA5462",
+    "leaderStatus": "return",
+    "leaderPayload": {
+      "readable": "null"
+    },
+    "votes": {
+      "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "agree",
+      "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "idle",
+      "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "idle",
+      "0xA793D9dc0ED9edC1f9F732bB68b5D3AFA934F52D": "agree",
+      "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "agree"
+    },
+    "eqOutputs": {
+      "0": {
+        "status": "return",
+        "payload": {
+          "readable": "\"EXPLOIT\""
+        }
+      }
+    }
+  },
+  "claim": "{\"claimant\": \"0x11DDE75553F54aE146B9e1FECf319da7b819Eb45\", \"index\": 1, \"key\": \"cistern-demo\", \"note\": \"\", \"pattern\": \"total_claimable exceeds total_deposited, so the vault currently owes more units than were ever put into it\", \"pinnedReading\": \"{\\\"methods\\\": [\\\"vault_report\\\"], \\\"pattern\\\": \\\"total_claimable exceeds total_deposited, so the vault currently owes more units than were ever put into it\\\", \\\"readings\\\": {\\\"vault_report\\\": \\\"{\\\\\\\"accrual_calls\\\\\\\": \\\\\\\"1\\\\\\\", \\\\\\\"excess_claimable\\\\\\\": \\\\\\\"250\\\\\\\", \\\\\\\"invariant\\\\\\\": \\\\\\\"total_claimable must never exceed total_deposited\\\\\\\", \\\\\\\"stanch\\\\\\\": \\\\\\\"0x6012505Dda1Ee7a105C7949778D8Bb800bAA5462\\\\\\\", \\\\\\\"stanch_key\\\\\\\": \\\\\\\"cistern-demo\\\\\\\", \\\\\\\"total_claimable\\\\\\\": \\\\\\\"1250\\\\\\\", \\\\\\\"total_deposited\\\\\\\": \\\\\\\"1000\\\\\\\"}\\\"}, \\\"target\\\": \\\"0x4109BC36B3178322D1a720b3FEbe8a81AFBdBD72\\\"}\", \"readingSpec\": \"{\\\"methods\\\": [\\\"vault_report\\\"]}\", \"statusAfter\": \"HALTED\", \"target\": \"0x4109BC36B3178322D1a720b3FEbe8a81AFBdBD72\", \"verdict\": \"EXPLOIT\"}",
+  "statusAfter": "HALTED",
+  "verdict": "EXPLOIT",
+  "pass": true
+}
