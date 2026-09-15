@@ -1,8 +1,0 @@
-{
-  "gate": "G2",
-  "statusOf": "RUNNING",
-  "statusSeenByTarget": "RUNNING",
-  "unregisteredKeyReads": "UNKNOWN",
-  "observedAtUtc": "2026-09-15T15:16:35Z",
-  "pass": true
-}

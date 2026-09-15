@@ -7,6 +7,10 @@ from tools.studio_next import client, explorer_address, explorer_tx
 
 ROOT = Path(__file__).resolve().parent.parent
 
+WAIT_INTERVAL = 10
+WAIT_RETRIES = 90
+_FEE_CACHE: dict = {}
+
 
 def retry(action, attempts: int = 6, delay: int = 10, label: str = ""):
     last = None
@@ -28,14 +32,17 @@ def retry(action, attempts: int = 6, delay: int = 10, label: str = ""):
 
 
 def deploy(gl, source: Path, args: Optional[list] = None) -> dict:
-    fees = retry(lambda: gl.estimate_transaction_fees(), label="fee estimate")
+    fees = generic_fees(gl)
     tx = retry(
         lambda: gl.deploy_contract(code=source.read_bytes(), args=args or [], fees=fees),
         label="deploy",
     )
     receipt = retry(
         lambda: gl.wait_for_transaction_receipt(
-            transaction_hash=tx, wait_until="finalized", retries=200, interval=4
+            transaction_hash=tx,
+            wait_until="finalized",
+            retries=WAIT_RETRIES,
+            interval=WAIT_INTERVAL,
         ),
         label="deploy receipt",
     )
@@ -52,14 +59,30 @@ def call(gl, address: str, method: str, args: Optional[list] = None, value: int 
     )
     receipt = retry(
         lambda: gl.wait_for_transaction_receipt(
-            transaction_hash=tx, wait_until="finalized", retries=200, interval=4
+            transaction_hash=tx,
+            wait_until="finalized",
+            retries=WAIT_RETRIES,
+            interval=WAIT_INTERVAL,
         ),
         label=f"receipt {method}",
     )
     return summarize(receipt, tx)
 
 
+def generic_fees(gl) -> dict:
+    if "generic" not in _FEE_CACHE:
+        _FEE_CACHE["generic"] = retry(
+            lambda: gl.estimate_transaction_fees(), label="fee estimate"
+        )
+    return _FEE_CACHE["generic"]
+
+
+MESSAGE_EMITTING = ("p1_spawn", "p2_async_call", "p4_pay_out")
+
+
 def estimate_fees_for(gl, address: str, method: str, args: Optional[list], value: int) -> dict:
+    if method not in MESSAGE_EMITTING and value == 0:
+        return generic_fees(gl)
     try:
         return retry(
             lambda: gl.estimate_transaction_fees_for_write(

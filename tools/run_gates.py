@@ -49,10 +49,16 @@ def save_state(state: dict) -> None:
     STATE.write_text(json.dumps(state, indent=2, default=str) + "\n")
 
 
+_FUNDED = {"done": False}
+
+
 def ensure_funds(gl, minimum: int = 40 * 10**18) -> None:
+    if _FUNDED["done"]:
+        return
     address = gl.local_account.address
     if balance(gl, address) < minimum:
         fund(gl, address, 500 * 10**18)
+    _FUNDED["done"] = True
 
 
 def deploy_all(gl, state: dict) -> dict:

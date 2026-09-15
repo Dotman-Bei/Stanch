@@ -1,0 +1,13 @@
+N2 — no write path to any target
+observed: 2026-09-15T15:22:50Z
+commit:   85f51be5d3a9b0ace815922b5db176da259eb6d7
+
+$ grep -nE '\.emit\(|emit_transfer|contract\.deploy|contract\.interface' contracts/stanch.py
+# expect: no output
+(no output)
+# exit status 1
+
+$ grep -n 'gl.contract.get_at' contracts/stanch.py
+# expect: .view() only, never .emit
+145:        view = gl.contract.get_at(gl.Address(target_address)).view()
+# exit status 0

@@ -1,0 +1,13 @@
+N3 — no payable method and no value custody
+observed: 2026-09-15T15:22:50Z
+commit:   85f51be5d3a9b0ace815922b5db176da259eb6d7
+
+$ grep -n 'payable' contracts/stanch.py
+# expect: no output
+(no output)
+# exit status 1
+
+$ grep -n 'gl.message.value' contracts/stanch.py
+# expect: no output
+(no output)
+# exit status 1

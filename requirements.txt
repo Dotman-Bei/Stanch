@@ -1,0 +1,7 @@
+# Pinned prereleases. PRD section 8: do not upgrade mid-build.
+#
+# genlayer-test 0.29.2, the highest non-prerelease, pins genlayer-py<0.17.0,
+# which has no chain entry for 61997 and builds the pre-fee addTransaction ABI.
+# Deploying through it reverts at the EVM layer. See DECISIONS.md D-001.
+genlayer-py==0.19.0rc2
+genlayer-test==0.30.0rc2

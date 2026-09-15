@@ -1,9 +1,9 @@
 {
   "schemaVersion": "stanch.claims/1",
   "project": "STANCH",
-  "updatedAtUtc": "2026-09-15T00:00:00Z",
+  "updatedAtUtc": "2026-09-15T15:24:52Z",
   "revision": {
-    "baseCommit": "UNSET",
+    "baseCommit": "85f51be5d3a9b0ace815922b5db176da259eb6d7",
     "branch": "main"
   },
   "network": {
@@ -39,17 +39,25 @@
     "STANCH is opt-in and pull-based. It cannot halt a contract that was not written to read it.",
     "STANCH reads current state only. An exploit that has completed and left no readable trace cannot be halted.",
     "A refusal observed through a read call is not a mined reverted transaction, and rows say which was observed.",
-    "Validator agreement on a classification is agreement, not correctness."
+    "Validator agreement on a classification is agreement, not correctness.",
+    "The demo target's defect was authored by us. Nothing here is detection of an unknown exploit in an unfamiliar contract."
   ],
   "claims": [
     {
       "id": "P3-SYNC-CROSS-CONTRACT-VIEW",
       "claim": "A GenLayer Intelligent Contract on Studio Next can synchronously read another Intelligent Contract through gl.get_contract_at(addr).view(), both inside a write transaction and inside a view call.",
-      "status": "UNMEASURED",
-      "evidenceClasses": [],
-      "scope": { "chainId": 61997, "probe": "P3" },
-      "observedAtUtc": null,
-      "evidence": ["probes/results.json"],
+      "status": "SUPPORTED",
+      "evidenceClasses": [
+        "studio_next_observation"
+      ],
+      "scope": {
+        "chainId": 61997,
+        "probe": "P3"
+      },
+      "observedAtUtc": "2026-09-15T15:24:52Z",
+      "evidence": [
+        "probes/results.json"
+      ],
       "reproduce": "See probes/PROBE.md, probe P3",
       "limitations": [
         "The entire STANCH architecture depends on this single capability. If it fails, see PRD section 17, K1.",
@@ -58,12 +66,19 @@
     },
     {
       "id": "P2-ASYNC-EMIT-EXECUTION",
-      "claim": "On Studio Next, an asynchronous message emitted by an Intelligent Contract through gl.get_contract_at(addr).emit() either does or does not reach the callee; this row records which, and does not assert that STANCH depends on it either way.",
-      "status": "UNMEASURED",
-      "evidenceClasses": [],
-      "scope": { "chainId": 61997, "probe": "P2" },
-      "observedAtUtc": null,
-      "evidence": ["probes/results.json"],
+      "claim": "On Studio Next an asynchronous message emitted by an Intelligent Contract through gl.contract.get_at(addr).emit() does reach the callee, once the transaction carries a fee allocation for that message; the callee's counter went from 0 to 1 and recorded the emitting contract as its caller. This row records that observation and does not assert that STANCH depends on the behaviour either way.",
+      "status": "SUPPORTED",
+      "evidenceClasses": [
+        "studio_next_observation"
+      ],
+      "scope": {
+        "chainId": 61997,
+        "probe": "P2"
+      },
+      "observedAtUtc": "2026-09-15T15:24:52Z",
+      "evidence": [
+        "probes/results.json"
+      ],
       "reproduce": "See probes/PROBE.md, probe P2",
       "limitations": [
         "Upstream issue genvm-manager#20 reports this path is broken on chain 4221 and was still open and unassigned as of 15 September 2026.",
@@ -72,19 +87,69 @@
       ]
     },
     {
+      "id": "P1-CONTRACT-INITIATED-DEPLOY",
+      "claim": "On Studio Next, gl.contract.deploy called from inside a contract produces a contract that is reachable, though not immediately: the returned address read as 'contract not found' on the first attempt and answered about twenty seconds later, once the deploy message finalized.",
+      "status": "SUPPORTED",
+      "evidenceClasses": [
+        "studio_next_observation"
+      ],
+      "scope": {
+        "chainId": 61997,
+        "probe": "P1"
+      },
+      "observedAtUtc": "2026-09-15T15:24:37Z",
+      "evidence": [
+        "probes/results.json"
+      ],
+      "reproduce": "See probes/PROBE.md, probe P1",
+      "limitations": [
+        "The twenty-second figure is one polling observation on one deployment, not a measured latency bound.",
+        "A single read taken immediately after the parent transaction would have recorded this probe as a failure, and did on an earlier run. See DECISIONS.md D-006.",
+        "STANCH does not use contract-initiated deployment. This row documents chain behaviour, not a STANCH capability."
+      ]
+    },
+    {
+      "id": "P4-VALUE-CANNOT-LEAVE-A-CONTRACT",
+      "claim": "On Studio Next, value paid into an Intelligent Contract arrives and value paid out through emit_transfer does not move, while the paying contract's own log records the payout as done; the balance was unchanged immediately after the call and again ninety seconds later.",
+      "status": "SUPPORTED",
+      "evidenceClasses": [
+        "studio_next_observation"
+      ],
+      "scope": {
+        "chainId": 61997,
+        "probe": "P4"
+      },
+      "observedAtUtc": "2026-09-15T15:24:37Z",
+      "evidence": [
+        "probes/results.json"
+      ],
+      "reproduce": "See probes/PROBE.md, probe P4, and REPRODUCE.md section 2",
+      "limitations": [
+        "One contract, one transfer, one amount. No sweep over amounts, recipients or message types was run.",
+        "Observed on Studio Next only. It does not establish the same behaviour on Asimov, Bradbury or any other GenLayer network.",
+        "It narrows rather than confirms upstream issue genvm-manager#20: on this chain internal emitted calls (P2) and contract-initiated deploys (P1) do execute, and only the value transfer does not.",
+        "No upstream maintainer has confirmed this reproduction at the time of writing."
+      ]
+    },
+    {
       "id": "N1-NO-RESUME",
       "claim": "STANCH cannot resume a halted target. No method sets a status back to RUNNING, and no code path writes RUNNING after construction; this is a property of the committed source, not a permission check that an operator could bypass.",
-      "status": "UNMEASURED",
-      "evidenceClasses": [],
-      "scope": { "contract": "contracts/stanch.py" },
-      "observedAtUtc": null,
+      "status": "PARTIAL",
+      "evidenceClasses": [
+        "source_inspection"
+      ],
+      "scope": {
+        "contract": "contracts/stanch.py"
+      },
+      "observedAtUtc": "2026-09-15T15:24:52Z",
       "evidence": [
-        "evidence/source-inspection/n1-no-resume.txt",
-        "tests/test_no_resume.py"
+        "evidence/source-inspection/n1-no-resume.txt"
       ],
       "reproduce": "grep -n 'RUNNING' contracts/stanch.py && gltest tests/test_no_resume.py",
       "limitations": [
         "Establishes the absence of a resume path in this version of the source, not across future versions.",
+        "A grep over committed source, not a VM-level capability proof.",
+        "The on-chain half \u2014 calling every public method against a halted key and observing the status stay HALTED \u2014 lives in tests/test_no_resume.py and is not reflected in this row's status until that suite is run and recorded.",
         "Does not prevent a target from ignoring a HALTED verdict; enforcement is the target's own guard clause.",
         "Not a formal verification."
       ]
@@ -92,11 +157,17 @@
     {
       "id": "N2-NO-WRITE-PATH",
       "claim": "STANCH has no write path to any contract it can halt. The symbols .emit(, emit_transfer, gl.deploy_contract and gl.evm.contract_interface appear nowhere in contracts/stanch.py.",
-      "status": "UNMEASURED",
-      "evidenceClasses": [],
-      "scope": { "contract": "contracts/stanch.py" },
-      "observedAtUtc": null,
-      "evidence": ["evidence/source-inspection/n2-no-write-path.txt"],
+      "status": "SUPPORTED",
+      "evidenceClasses": [
+        "source_inspection"
+      ],
+      "scope": {
+        "contract": "contracts/stanch.py"
+      },
+      "observedAtUtc": "2026-09-15T15:24:52Z",
+      "evidence": [
+        "evidence/source-inspection/n2-no-write-path.txt"
+      ],
       "reproduce": "grep -nE '\\.emit\\(|emit_transfer|deploy_contract|contract_interface' contracts/stanch.py",
       "limitations": [
         "A grep over committed source, not a VM-level capability proof.",
@@ -107,18 +178,23 @@
     {
       "id": "N3-NO-VALUE-CUSTODY",
       "claim": "STANCH never takes custody of value. No payable method exists on the contract and its observed balance is zero.",
-      "status": "UNMEASURED",
-      "evidenceClasses": [],
-      "scope": { "contract": "contracts/stanch.py", "chainId": 61997 },
-      "observedAtUtc": null,
+      "status": "PARTIAL",
+      "evidenceClasses": [
+        "source_inspection"
+      ],
+      "scope": {
+        "contract": "contracts/stanch.py",
+        "chainId": 61997
+      },
+      "observedAtUtc": "2026-09-15T15:24:52Z",
       "evidence": [
-        "evidence/source-inspection/n3-no-payable.txt",
-        "evidence/studio-next/stanch-balance.json"
+        "evidence/source-inspection/n3-no-payable.txt"
       ],
       "reproduce": "grep -n 'payable' contracts/stanch.py && see REPRODUCE.md, balance read",
       "limitations": [
-        "A balance read is a point-in-time observation, not a guarantee about future blocks.",
-        "The ghost contract on the EVM layer is a separate surface and is not covered by this row."
+        "Source inspection only. No balance read of the deployed STANCH address is recorded in this row, so the claim rests on the absence of a payable method rather than on an observed zero balance.",
+        "The ghost contract on the EVM layer is a separate surface and is not covered by this row.",
+        "Probe P4 shows that value which did reach a contract on this chain could not be paid out, so a balance arriving by some path not through a payable method would be stranded rather than recoverable."
       ]
     },
     {
@@ -126,9 +202,14 @@
       "claim": "A submitted claim whose pinned reading does not support the asserted pattern returns CLEAR and does not halt the target; the target was still RUNNING after the verdict.",
       "status": "UNMEASURED",
       "evidenceClasses": [],
-      "scope": { "chainId": 61997, "gate": "G5" },
+      "scope": {
+        "chainId": 61997,
+        "gate": "G5"
+      },
       "observedAtUtc": null,
-      "evidence": ["evidence/studio-next/g5-false-claim.json"],
+      "evidence": [
+        "evidence/studio-next/g5-false-claim.json"
+      ],
       "reproduce": "See REPRODUCE.md, gate G5",
       "limitations": [
         "One refused claim is one observation, not a measured false-positive rate.",
@@ -138,20 +219,26 @@
     },
     {
       "id": "N5-STANDARD-IMMUTABLE",
-      "claim": "The classification standard cannot be changed by anyone, including the deployer, because STANCH deployed with an empty upgraders list and its code slot is locked from the end of construction.",
-      "status": "UNMEASURED",
-      "evidenceClasses": [],
-      "scope": { "chainId": 61997, "probe": "P5" },
-      "observedAtUtc": null,
+      "claim": "STANCH deployed with an empty upgraders list and four locked slots, read from inside the VM through gl.storage.Root.get(); no upgrade attempt was made against it, so the refusal half of this claim is unmeasured and the claim does not assert that an upgrade would fail.",
+      "status": "PARTIAL",
+      "evidenceClasses": [
+        "studio_next_observation"
+      ],
+      "scope": {
+        "chainId": 61997,
+        "probe": "P5"
+      },
+      "observedAtUtc": "2026-09-15T15:24:52Z",
       "evidence": [
-        "evidence/studio-next/p5-upgraders-empty.json",
-        "evidence/studio-next/p5-upgrade-refused.json"
+        "probes/results.json"
       ],
       "reproduce": "See probes/PROBE.md, probe P5",
       "limitations": [
-        "Rests on documented GenVM upgradability semantics that must be confirmed by observation, not assumed.",
+        "The refusal half is UNMEASURED. Neither genlayer-py 0.19.0rc2 nor genlayer-js 2.0.0-rc.1 exposes a code upgrade path for Intelligent Contracts, so no upgrade transaction could be constructed to be refused.",
+        "No JSON-RPC method on Studio Next returns the root slot; gen_getContractState, sim_getContractState, gen_getUpgraders and gen_dbg_getContractState all return Method not found. The list is read by a view method on the contract itself.",
+        "That the contract reports its own upgraders list is a publisher_claim about our own code unless a reviewer reads the same slot independently.",
         "Immutability of the standard is not immutability of the classifier; validator model behaviour is outside this claim.",
-        "Does not establish that the standard is correct, only that it cannot be changed."
+        "Does not establish that the standard is correct, only that it is not writable through any method STANCH exposes."
       ]
     },
     {
@@ -159,9 +246,14 @@
       "claim": "A claim pointing at a genuinely violated invariant in CISTERN returned EXPLOIT under validator consensus and flipped the registered status to HALTED in a finalized transaction.",
       "status": "UNMEASURED",
       "evidenceClasses": [],
-      "scope": { "chainId": 61997, "gate": "G3" },
+      "scope": {
+        "chainId": 61997,
+        "gate": "G3"
+      },
       "observedAtUtc": null,
-      "evidence": ["evidence/studio-next/g3-true-halt.json"],
+      "evidence": [
+        "evidence/studio-next/g3-true-halt.json"
+      ],
       "reproduce": "See REPRODUCE.md, gate G3",
       "limitations": [
         "CISTERN's defect was authored by us for demonstration; this is not detection of an unknown exploit in an unfamiliar contract.",
@@ -174,9 +266,14 @@
       "claim": "After the status flip, a CISTERN state-changing call reverted with STANCH_HALTED, and the refusal was produced by CISTERN reading STANCH, not by STANCH writing to CISTERN.",
       "status": "UNMEASURED",
       "evidenceClasses": [],
-      "scope": { "chainId": 61997, "gate": "G4" },
+      "scope": {
+        "chainId": 61997,
+        "gate": "G4"
+      },
       "observedAtUtc": null,
-      "evidence": ["evidence/studio-next/g4-halted-revert.json"],
+      "evidence": [
+        "evidence/studio-next/g4-halted-revert.json"
+      ],
       "reproduce": "See REPRODUCE.md, gate G4",
       "limitations": [
         "Demonstrates enforcement in a target we wrote to cooperate. An uncooperative target is unprotected by design.",
@@ -188,9 +285,14 @@
       "claim": "An insufficient claim returned INDETERMINATE, changed no state, and is displayed in the interface as neither a pass nor a fail.",
       "status": "UNMEASURED",
       "evidenceClasses": [],
-      "scope": { "chainId": 61997, "gate": "G6" },
+      "scope": {
+        "chainId": 61997,
+        "gate": "G6"
+      },
       "observedAtUtc": null,
-      "evidence": ["evidence/studio-next/g6-indeterminate.json"],
+      "evidence": [
+        "evidence/studio-next/g6-indeterminate.json"
+      ],
       "reproduce": "See REPRODUCE.md, gate G6",
       "limitations": [
         "One observation. No rate of indeterminate outcomes has been measured.",
@@ -202,9 +304,13 @@
       "claim": "A claim whose prose asserts an exploit while its pinned reading shows a healthy invariant returned CLEAR, and a reading containing instruction-shaped text did not produce EXPLOIT.",
       "status": "UNMEASURED",
       "evidenceClasses": [],
-      "scope": { "campaign": "PRD section 20" },
+      "scope": {
+        "campaign": "PRD section 20"
+      },
       "observedAtUtc": null,
-      "evidence": ["evidence/studio-next/campaign-injection.json"],
+      "evidence": [
+        "evidence/studio-next/campaign-injection.json"
+      ],
       "reproduce": "See REPRODUCE.md, adversarial campaign",
       "limitations": [
         "Two payloads is not a sweep. No systematic injection corpus has been run.",
@@ -222,8 +328,8 @@
       "evidence": [],
       "reproduce": null,
       "limitations": [
-        "Deliberately out of scope. Upstream issue genvm-manager#20 reports that value can be paid into a contract and not out, which would strand any bond.",
-        "STANCH takes no custody of value in this version. See PRD section 16."
+        "Deliberately out of scope. Our own probe P4 on Studio Next shows value paid into a contract cannot be paid out while the contract's log records the payout as done, so any bond would be stranded. See P4-VALUE-CANNOT-LEAVE-A-CONTRACT.",
+        "STANCH takes no custody of value in this version. Claim spam is addressed by the record being public and append-only, not by economics."
       ]
     },
     {
