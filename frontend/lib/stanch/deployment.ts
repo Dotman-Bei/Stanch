@@ -6,7 +6,7 @@ interface DeployedContract {
   explorer?: string;
   addressExplorer?: string;
   executionResult?: string;
-  lifecycle?: { state?: string; outcome?: string };
+  lifecycle?: { state?: string; outcome?: string } | null;
 }
 
 interface Registration {
@@ -27,7 +27,7 @@ export interface DeploymentRecord {
   gates?: Record<string, { gate?: string; pass?: boolean; tx?: DeployedContract }>;
 }
 
-export const DEPLOYMENT = raw as DeploymentRecord;
+export const DEPLOYMENT = raw as unknown as DeploymentRecord;
 
 export function isDeployed(): boolean {
   return Boolean(DEPLOYMENT.stanch?.address);

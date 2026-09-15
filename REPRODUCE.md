@@ -121,19 +121,38 @@ Then publish the addresses to the interface and the ledger:
 
 ## 4. Tests (G7 support)
 
+Everything that does not need a verdict:
+
 ```bash
-.venv/bin/gltest tests/ -v
+.venv/bin/gltest tests/test_registry.py -v
+.venv/bin/gltest tests/test_no_resume.py tests/test_guard_clause.py -v \
+  -k "source or named or written or only_status or accounted or upgraders \
+      or writes_succeed or fixed_target"
 ```
 
-The suite is mostly negative and adversarial, per PRD §19. The source-inspection
-tests in `tests/test_no_resume.py` need no network and finish instantly:
+13 passed when this was written. The transcript, including the five tests that
+could not run and why, is in `evidence/tests/transcript.txt`.
+
+The source-inspection tests need no network at all and finish instantly:
 
 ```bash
 .venv/bin/python -m pytest tests/test_no_resume.py \
   -k "source or named or written or only_status or accounted" -q
 ```
 
-The rest deploy to Studio Next and wait on consensus, so budget several minutes.
+The full suite needs a decided verdict:
+
+```bash
+.venv/bin/gltest tests/ -v
+```
+
+**This will hang if Studio Next is not deciding non-deterministic transactions.**
+Check first — the symptom is a `submit_claim` sitting in `processing` with zero
+validator votes while `eth_blockNumber` answers normally:
+
+```bash
+.venv/bin/python -m tools.observe_deployment <STANCH address>
+```
 
 ---
 
@@ -153,7 +172,39 @@ than rendering a placeholder that looks live.
 
 ---
 
-## 6. Rate limits
+## 6. Reading a deployment back without re-running anything
+
+Every address, transaction and claim in this repository can be re-derived from the
+chain. Nothing needs a local log.
+
+```bash
+# live state: registry, every claim with its pinned reading, the root slot,
+# both vault reports, and a fresh write attempt against a halted target
+.venv/bin/python -m tools.observe_deployment 0xe3C5B525a413797F86a2742C9C5d1502045EBC24
+
+# full transaction history per address, with each calldata decoded
+.venv/bin/python -m tools.recover_transactions \
+  0xe3C5B525a413797F86a2742C9C5d1502045EBC24 \
+  0x288aA7651e3260fA13B09bD86c7430FD52585f30 \
+  0xCac4C9B43FC343b1D5003Bd400299e12b7db271b \
+  0x84E5C85E5C7a44Ed3f3c950C39953A5d70257C60
+
+# join the two into deployment.json and the per-gate evidence files
+.venv/bin/python -m tools.assemble_evidence
+
+# regenerate the README gate table and the ledger from what is on disk
+.venv/bin/python -m tools.gate_status
+.venv/bin/python -m tools.update_ledger
+```
+
+`gate_status.py` and `update_ledger.py` are both pure functions of the evidence
+files. A ledger row whose evidence file is missing is forced back to `UNMEASURED`
+rather than left wherever a human put it, and a gate with no record reads
+`NOT YET RUN` rather than being omitted.
+
+---
+
+## 7. Rate limits
 
 Studio Next allows 5000 read requests per hour per client. A full
 `run_probes` plus `run_gates all` fits inside that; running both twice in an hour

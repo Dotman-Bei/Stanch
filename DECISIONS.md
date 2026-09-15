@@ -490,3 +490,21 @@ guardian that must wait on consensus inherits consensus availability as a failur
 mode, and no amount of removing the guardian's powers fixes that. It is now a
 standing caveat in `evidence/claims.json` and a non-goal in the README rather
 than something a reviewer has to discover.
+
+### D-010 addendum — the stall was re-probed and is still present
+
+A single `submit_claim` was sent directly against the live STANCH at
+`0xe3C5B525a413797F86a2742C9C5d1502045EBC24`, well after the gate runs, as an
+independent check rather than as part of a batch:
+
+```
+transaction 0x4bb362d16771806a51dfe701708c1bf5490de4f45e6ae8402a6fcb43274ea469
+state {'state': 'processing', 'phase': 'proposing'} after 500s
+claim_count before and after: 2
+```
+
+`eth_blockNumber` answered normally throughout, and the claim list did not grow.
+The outage is specific to the non-deterministic path and outlasted the build
+window. Everything downstream of a verdict — G6, the injection attack in §20, and
+the verdict-pipeline tests — is therefore unmeasured on Studio Next and is labelled
+that way rather than being filled in from an earlier run.

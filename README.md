@@ -148,6 +148,12 @@ each row in `evidence/claims.json` carries its own limitations.
 **N4 is the one that makes the other four believable**, because it requires
 demoing the system declining to act. Gate G5 is not optional here.
 
+**N1 is `PARTIAL`, not `SUPPORTED`.** No method that restores `RUNNING` exists in
+the source, and four structural tests hold that line. The on-chain half — calling
+every public method against a halted key and watching the status refuse to move —
+is **unrun**, because it needs a verdict and verdicts stopped being decided. See
+the outage note below.
+
 **N5 is `PARTIAL`, not `SUPPORTED`.** The upgraders list is observed empty on
 Studio Next, read from inside the VM through `gl.storage.Root.get()`. The second
 half — an upgrade attempt that is refused — could not be measured, because
@@ -155,6 +161,43 @@ neither `genlayer-py 0.19.0rc2` nor `genlayer-js 2.0.0-rc.1` exposes a code
 upgrade path for Intelligent Contracts, so there is no transaction to be refused.
 An immutability claim with half its evidence missing is worse than no
 immutability claim.
+
+---
+
+## The outage, and what it cost this submission
+
+Late in the build, Studio Next stopped deciding non-deterministic transactions.
+Nine consecutive `submit_claim` transactions stalled in `processing` with zero
+validator votes committed, and an independent re-probe half an hour later stalled
+the same way:
+
+```
+transaction 0x4bb362d16771806a51dfe701708c1bf5490de4f45e6ae8402a6fcb43274ea469
+state {'state': 'processing', 'phase': 'proposing'} after 500s
+claim_count before and after: 2
+```
+
+Deterministic writes against the same contracts, from the same account, in the
+same minutes, decided normally. The chain was up; the path that calls a model was
+not moving.
+
+**What is unmeasured because of it**, listed rather than quietly dropped:
+
+- **G6** — the `INDETERMINATE` verdict. `BLOCKED`, not failed: nothing was
+  measured. The path is decided deterministically in `_reading_defect` before any
+  model runs, so it is source- and test-supported, and the ledger says exactly
+  that.
+- **The injection attack** in the adversarial campaign. The target is deployed and
+  registered and its view surface does return text instructing a classifier to
+  answer `EXPLOIT` — no claim against it could be decided.
+- **Three tests** that need a halted key, plus the whole verdict-pipeline and
+  injection suites. Listed as unrun at the foot of `evidence/tests/transcript.txt`.
+
+**This is the most important limitation in the build, and it is not a bug in
+STANCH.** If the chain will not process the verdict transaction, the halt does not
+happen. A guardian that must wait on consensus inherits consensus availability as
+a failure mode, and removing the guardian's powers does nothing about it. It is a
+standing caveat in `evidence/claims.json`.
 
 ---
 
@@ -227,6 +270,27 @@ Everything around it is deterministic and re-executed by every validator:
 
 A reading that could not be gathered is recorded `INDETERMINATE` in code, with no
 model consulted. `INDETERMINATE` is never collapsed into `CLEAR`.
+
+---
+
+## Tests
+
+13 pass against Studio Next. Transcript in `evidence/tests/transcript.txt`, which
+also lists the five that could not run and why.
+
+```
+tests/test_registry.py ................................. 5 passed
+tests/test_no_resume.py (source + root slot) ........... 6 passed
+tests/test_guard_clause.py (deterministic subset) ...... 2 passed
+```
+
+The suite is mostly negative and adversarial by design. The source-inspection
+tests need no network and finish in hundredths of a second:
+
+```bash
+.venv/bin/python -m pytest tests/test_no_resume.py \
+  -k "source or named or written or only_status or accounted" -q
+```
 
 ---
 

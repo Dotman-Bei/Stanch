@@ -1,9 +1,9 @@
 {
   "schemaVersion": "stanch.claims/1",
   "project": "STANCH",
-  "updatedAtUtc": "2026-09-15T16:25:23Z",
+  "updatedAtUtc": "2026-09-15T16:31:50Z",
   "revision": {
-    "baseCommit": "e81cce0e9bc2040ac203ff2270d570a78e56286e",
+    "baseCommit": "fe46cf0f9371a4c526f29a7299a0386f4e6a1861",
     "branch": "main"
   },
   "network": {
@@ -55,7 +55,7 @@
         "chainId": 61997,
         "probe": "P3"
       },
-      "observedAtUtc": "2026-09-15T16:25:23Z",
+      "observedAtUtc": "2026-09-15T16:31:50Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -76,7 +76,7 @@
         "chainId": 61997,
         "probe": "P2"
       },
-      "observedAtUtc": "2026-09-15T16:25:23Z",
+      "observedAtUtc": "2026-09-15T16:31:50Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -142,15 +142,15 @@
       "scope": {
         "contract": "contracts/stanch.py"
       },
-      "observedAtUtc": "2026-09-15T16:25:23Z",
+      "observedAtUtc": "2026-09-15T16:31:50Z",
       "evidence": [
         "evidence/source-inspection/n1-no-resume.txt"
       ],
       "reproduce": "grep -n 'RUNNING' contracts/stanch.py && gltest tests/test_no_resume.py",
       "limitations": [
+        "The on-chain half is UNRUN. test_no_public_method_restores_running_on_a_halted_key needs a halted key, which needs a verdict, which the Studio Next outage in DECISIONS.md D-010 blocked. The claim therefore rests on source inspection plus four structural tests, not on an observation of a halted key refusing to move.",
         "Establishes the absence of a resume path in this version of the source, not across future versions.",
-        "A grep over committed source, not a VM-level capability proof.",
-        "The on-chain half \u2014 calling every public method against a halted key and observing the status stay HALTED \u2014 lives in tests/test_no_resume.py and is not reflected in this row's status until that suite is run and recorded.",
+        "A grep and four AST-shaped tests over committed source, not a VM-level capability proof.",
         "Does not prevent a target from ignoring a HALTED verdict; enforcement is the target's own guard clause.",
         "Not a formal verification."
       ]
@@ -165,7 +165,7 @@
       "scope": {
         "contract": "contracts/stanch.py"
       },
-      "observedAtUtc": "2026-09-15T16:25:23Z",
+      "observedAtUtc": "2026-09-15T16:31:50Z",
       "evidence": [
         "evidence/source-inspection/n2-no-write-path.txt"
       ],
@@ -187,7 +187,7 @@
         "contract": "contracts/stanch.py",
         "chainId": 61997
       },
-      "observedAtUtc": "2026-09-15T16:25:23Z",
+      "observedAtUtc": "2026-09-15T16:31:50Z",
       "evidence": [
         "evidence/source-inspection/n3-no-payable.txt"
       ],
@@ -210,7 +210,7 @@
         "chainId": 61997,
         "gate": "G5"
       },
-      "observedAtUtc": "2026-09-15T16:25:23Z",
+      "observedAtUtc": "2026-09-15T16:31:50Z",
       "evidence": [
         "evidence/studio-next/g5-false-claim.json"
       ],
@@ -218,7 +218,8 @@
       "limitations": [
         "One refused claim is one observation, not a measured false-positive rate.",
         "The refusal was produced by the classifier under the standard fixed in code; a differently worded false claim may not be refused.",
-        "No adversarial sweep over claim phrasings has been run. See PRD section 20."
+        "No adversarial sweep over claim phrasings has been run, and the injection attack in PRD section 20 could not be run at all: the Studio Next outage in DECISIONS.md D-010 blocked every further verdict.",
+        "The claim record and its pinned reading are readable on chain at the STANCH address in evidence/studio-next/deployment.json, so a reviewer can re-derive this row without trusting our transcript."
       ]
     },
     {
@@ -232,7 +233,7 @@
         "chainId": 61997,
         "probe": "P5"
       },
-      "observedAtUtc": "2026-09-15T16:25:23Z",
+      "observedAtUtc": "2026-09-15T16:31:50Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -257,7 +258,7 @@
         "chainId": 61997,
         "gate": "G3"
       },
-      "observedAtUtc": "2026-09-15T16:25:23Z",
+      "observedAtUtc": "2026-09-15T16:31:50Z",
       "evidence": [
         "evidence/studio-next/g3-true-halt.json"
       ],
@@ -279,7 +280,7 @@
         "chainId": 61997,
         "gate": "G4"
       },
-      "observedAtUtc": "2026-09-15T16:25:23Z",
+      "observedAtUtc": "2026-09-15T16:31:50Z",
       "evidence": [
         "evidence/studio-next/g4-halted-revert.json"
       ],
@@ -324,9 +325,10 @@
       ],
       "reproduce": "See REPRODUCE.md, adversarial campaign",
       "limitations": [
-        "Two payloads is not a sweep. No systematic injection corpus has been run.",
-        "Absence of a successful injection within this budget is not evidence of resistance; it is NO_WITNESS_WITHIN_BUDGET.",
-        "Any payload that did succeed is recorded here and in the README rather than removed."
+        "UNRUN, not merely unproven. The injection target is deployed and registered on Studio Next at the address in evidence/studio-next/deployment.json, and its view surface does return text instructing a classifier to answer EXPLOIT, but no claim against it could be decided: see DECISIONS.md D-010.",
+        "The standard in contracts/stanch.py addresses instruction-shaped readings explicitly, and that is a property of committed source, not evidence of resistance.",
+        "Absence of a successful injection within this budget would in any case be NO_WITNESS_WITHIN_BUDGET rather than evidence of resistance.",
+        "Any payload that did succeed would be recorded here and in the README rather than removed."
       ]
     },
     {
