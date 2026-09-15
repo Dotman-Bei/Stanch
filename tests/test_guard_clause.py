@@ -13,7 +13,7 @@ def test_writes_succeed_while_running(stanch, cistern):
 
 def test_target_refuses_its_own_writes_once_halted(stanch, cistern, halted):
     assert halted == "HALTED"
-    assert str(cistern.stanch_status(args=[])) != "RUNNING"
+    assert str(cistern.stanch_status(args=[]).call()) != "RUNNING"
 
     for method, args in (
         ("deposit", [10]),

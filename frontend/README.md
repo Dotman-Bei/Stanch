@@ -1,85 +1,57 @@
-# GenLayer Football Market
+# STANCH — interface
 
-Next.js frontend for GenLayer Football Market - AI-powered football match predictions on GenLayer blockchain.
+Four surfaces over the STANCH contract on GenLayer Studio Next, chain 61997.
+
+| Route | Surface | Wallet |
+|---|---|---|
+| `/` | Registry — every registered target, its key, its status, the transaction that bound it | not needed |
+| `/claim` | Submit a claim — target, reading recipe, asserted pattern, with a preview of the exact bytes that will be classified | **required to sign** |
+| `/verdict/[index]` | Verdict record — the pinned reading, the verdict over it, the target's status now | not needed |
+| `/proof` | Proof room — every claim on chain, the evidence ledger, and what each claim does not reach | not needed |
+
+**The no-wallet rule is a requirement, not a convenience.** A reviewer with no
+Studio Next funds must be able to see everything that matters. Only claim
+submission asks for a signature.
 
 ## Setup
 
-1. Install dependencies:
-
-**Using bun:**
 ```bash
-bun install
-```
-
-**Using npm:**
-```bash
-npm install
-```
-
-2. Create `.env` file:
-```bash
+npm install --legacy-peer-deps
 cp .env.example .env
-```
-
-3. Configure environment variables:
-   - `NEXT_PUBLIC_CONTRACT_ADDRESS` - GenLayer Football Betting contract address
-   - `NEXT_PUBLIC_GENLAYER_RPC_URL` - GenLayer RPC URL (defaults to `https://studio-next.genlayer.com/api`)
-   - `NEXT_PUBLIC_GENLAYER_CHAIN_ID` - RPC chain ID (defaults to `61997`)
-   - `NEXT_PUBLIC_GENLAYER_CHAIN_NAME` - Network label shown to users
-
-   Change the RPC URL and chain ID together. The same resolved network is used
-   by MetaMask, `genlayer-js`, and Transaction Kit.
-
-## Development
-
-**Using bun:**
-```bash
-bun dev
-```
-
-**Using npm:**
-```bash
+# set NEXT_PUBLIC_CONTRACT_ADDRESS to the deployed STANCH address from
+# ../evidence/studio-next/deployment.json
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+`--legacy-peer-deps` is required: the pinned prereleases
+`@genlayer/transaction-kit@0.1.0-rc.2` and `genlayer-js@2.0.0-rc.1` declare peer
+ranges npm 10 will not resolve unaided.
 
-## Build
+To refresh the addresses, probe results and claim ledger the pages read from:
 
-**Using bun:**
 ```bash
-bun run build
-bun start
+cd .. && .venv/bin/python -m tools.sync_frontend
 ```
 
-**Using npm:**
-```bash
-npm run build
-npm start
-```
+## What the interface will not do
 
-## Tech Stack
+- It never synthesises a value. If `NEXT_PUBLIC_CONTRACT_ADDRESS` is unset, or
+  Studio Next does not answer, the page says so.
+- An unreachable target reads `UNKNOWN`. It never reads `RUNNING`.
+- `INDETERMINATE` and `UNKNOWN` are styled as neither a pass nor a fail:
+  frost glass with a dashed edge, against the solid pills used for the two real
+  outcomes.
+- A ledger claim whose evidence file is missing renders as `UNMEASURED` rather
+  than being hidden.
 
-- **Next.js 16** - React framework with App Router
-- **TypeScript** - Type safety
-- **Tailwind CSS v4** - Styling with custom glass-morphism theme
-- **genlayer-js** - GenLayer blockchain SDK
-- **TanStack Query (React Query)** - Data fetching and caching
-- **Radix UI** - Accessible component primitives
-- **shadcn/ui** - Pre-built UI components
+## Design
 
-## Wallet Management
+The visual system is the Base Club / SocialFi brutalist specification in
+`../docs/brand/frontend.txt` v2.5.0: electric blue `#0038FF` ground, volt lime
+`#CCFF00` accent, deep abyss `#001A99` extrusion shadows, pure black outlines
+with hard offsets, frost-glass cards, Arial Black display type over Inter and
+JetBrains Mono. Addresses, hashes and counts are monospace with `tabular-nums`.
 
-The app connects to MetaMask, adds or switches to the configured GenLayer
-network, supports account switching, and remembers only the user's explicit
-disconnect preference. Private keys are never stored by the application.
-
-## Features
-
-- **Create Bets**: Create football match predictions with team names, game date, and predicted winner (Team 1, Team 2, or Draw)
-- **View Bets**: Real-time bet table with match details, predictions, status, and owners
-- **Resolve Bets**: Bet owners can resolve matches using GenLayer's AI to verify actual results
-- **Leaderboard**: Track top players by points earned from correct predictions
-- **Player Stats**: View your points and ranking in the community
-- **Glass-morphism UI**: Premium dark theme with OKLCH colors, backdrop blur effects, and smooth animations
-- **Data Refresh**: TanStack Query refreshes contract data after completed transactions and when the window regains focus
+Verdict states are separated by shape and weight rather than hue, so the
+three-way distinction survives in a two-colour palette. See `../DECISIONS.md`
+D-005.

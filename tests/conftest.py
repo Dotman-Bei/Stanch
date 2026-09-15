@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from gltest import get_contract_factory, get_default_account, get_gl_client
 
@@ -38,10 +40,7 @@ def cistern(stanch, account):
 def halted(stanch, cistern):
     for _ in range(6):
         cistern.accrue_yield(args=[]).transact(fees=fees())
-        report = cistern.vault_report(args=[]).call()
-        import json
-
-        parsed = json.loads(str(report))
+        parsed = json.loads(str(cistern.vault_report(args=[]).call()))
         if int(parsed["total_claimable"]) > int(parsed["total_deposited"]):
             break
     stanch.submit_claim(
