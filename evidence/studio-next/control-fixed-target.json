@@ -22,5 +22,5 @@
   "refusalReason": "NO_UNBACKED_HEADROOM",
   "vaultReport": "{\"accrual_calls\": \"0\", \"excess_claimable\": \"0\", \"invariant\": \"total_claimable must never exceed total_deposited\", \"stanch\": \"0xe3C5B525a413797F86a2742C9C5d1502045EBC24\", \"stanch_key\": \"cistern-fixed-control\", \"total_claimable\": \"1000\", \"total_deposited\": \"1000\"}",
   "statusAfter": "RUNNING",
-  "observedAtUtc": "2026-09-15T16:20:19Z"
+  "observedAtUtc": "2026-09-15T16:52:56Z"
 }

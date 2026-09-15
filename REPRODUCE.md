@@ -24,9 +24,23 @@ cd frontend && npm install --legacy-peer-deps && cd ..
 `@genlayer/transaction-kit@0.1.0-rc.2` and `genlayer-js@2.0.0-rc.1` declare peer
 ranges npm 10 will not resolve on its own.
 
-An account is generated and written to `.env` on first use, then funded through
-`sim_fundAccount`. `.env` is gitignored; nothing in it is secret, and nothing in
-it is worth anything.
+Then create and fund an account:
+
+```bash
+.venv/bin/python -m tools.bootstrap
+```
+
+This writes `STANCH_PRIVATE_KEY` to `.env` and funds it through
+`sim_fundAccount`. **Do this before anything else**, including the tests that
+need no network: `gltest.config.yaml` reads that variable while loading its
+configuration, so without it even a pure source-inspection run stops with
+
+```
+Gltest configure error: Environment variable STANCH_PRIVATE_KEY is not set
+```
+
+`.env` is gitignored. Nothing in it is secret and nothing in it is worth
+anything — Studio Next tokens are valueless.
 
 ---
 
@@ -77,7 +91,7 @@ a balance did not move.
 
 Outcome recorded in this repository: **P3 passes** (the architecture is
 buildable), P2 and P1 pass, **P4 fails** with value stranded in the contract, P5
-is partial. See `DECISIONS.md` D-006.
+is partial. See `DECISIONS.md` D1.
 
 ---
 

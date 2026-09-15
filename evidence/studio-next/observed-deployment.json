@@ -1,5 +1,5 @@
 {
-  "observedAtUtc": "2026-09-15T16:20:19Z",
+  "observedAtUtc": "2026-09-15T16:52:56Z",
   "note": "Read directly from Studio Next at the time above. Every field here is a live read of deployed state, not a replay of an earlier run's log.",
   "stanch": {
     "address": "0xe3C5B525a413797F86a2742C9C5d1502045EBC24",
@@ -33,7 +33,7 @@
   },
   "standardLength": 1912,
   "unregisteredKeyReads": "UNKNOWN",
-  "claimCount": 2,
+  "claimCount": 3,
   "claims": [
     {
       "claimant": "0x11DDE75553F54aE146B9e1FECf319da7b819Eb45",
@@ -58,6 +58,18 @@
       "statusAfter": "HALTED",
       "target": "0x288aA7651e3260fA13B09bD86c7430FD52585f30",
       "verdict": "EXPLOIT"
+    },
+    {
+      "claimant": "0x11DDE75553F54aE146B9e1FECf319da7b819Eb45",
+      "index": 2,
+      "key": "cistern-fixed-control",
+      "note": "",
+      "pattern": "the vault claimable total has been inflated beyond what was deposited",
+      "pinnedReading": "{\"methods\": [\"published_invariant\"], \"pattern\": \"the vault claimable total has been inflated beyond what was deposited\", \"readings\": {\"published_invariant\": \"total_claimable must never exceed total_deposited\"}, \"target\": \"0xCac4C9B43FC343b1D5003Bd400299e12b7db271b\"}",
+      "readingSpec": "{\"methods\": [\"published_invariant\"]}",
+      "statusAfter": "RUNNING",
+      "target": "0xCac4C9B43FC343b1D5003Bd400299e12b7db271b",
+      "verdict": "INDETERMINATE"
     }
   ],
   "claimsByVerdict": {
@@ -66,6 +78,9 @@
     ],
     "EXPLOIT": [
       1
+    ],
+    "INDETERMINATE": [
+      2
     ]
   },
   "targets": {
@@ -99,8 +114,8 @@
       "total_deposited": "1000"
     },
     "writeAttemptAfterHalt": {
-      "txHash": "0x03b82ac8b1fd216035e1893c1ccad3f4dc77387126f839f4180ebc23fe7b234d",
-      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x03b82ac8b1fd216035e1893c1ccad3f4dc77387126f839f4180ebc23fe7b234d",
+      "txHash": "0x4b0e920d932e772b0bddde893bf42fbc8d8f299ff7b1f0e27c370b50f31af8ed",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x4b0e920d932e772b0bddde893bf42fbc8d8f299ff7b1f0e27c370b50f31af8ed",
       "lifecycle": {
         "state": "decided",
         "outcome": "accepted"
@@ -113,10 +128,10 @@
       "leaderPayload": "STANCH_HALTED",
       "votes": {
         "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "agree",
-        "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "idle",
-        "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "agree",
-        "0xa0435f618c1F27B254998018AEa8Da5C77187852": "agree",
-        "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "idle"
+        "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "agree",
+        "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "idle",
+        "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "agree",
+        "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "idle"
       },
       "eqOutputs": {}
     },

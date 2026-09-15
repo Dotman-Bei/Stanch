@@ -88,6 +88,12 @@ def main() -> None:
         STANCH,
         lambda tx, c: "submit_claim" in c and "oracle_price_feed_history" in c,
     )
+    claim_insufficient = find(
+        STANCH,
+        lambda tx, c: "submit_claim" in c and "published_invariant" in c
+        and "total_deposited_units" not in c
+        and tx["executionResult"] == "FINISHED_WITH_RETURN",
+    )
 
     cistern_deposit = find(
         CISTERN,
@@ -105,6 +111,7 @@ def main() -> None:
     by_verdict = observed["claimsByVerdict"]
     true_index = (by_verdict.get("EXPLOIT") or [None])[0]
     false_index = (by_verdict.get("CLEAR") or [None])[0]
+    indeterminate_index = (by_verdict.get("INDETERMINATE") or [None])[0]
 
     deployment = {
         "network": {"name": "Studio Next", "chainId": 61997},
@@ -191,19 +198,48 @@ def main() -> None:
         and observed["cistern"]["writeReverted"] is True,
     }
 
-    gates["G6"] = {
-        "gate": "G6",
-        "pass": None,
-        "blocked": True,
-        "reason": (
-            "Studio Next stopped deciding non-deterministic transactions before G6 "
-            "could be re-run against the corrected reading spec. Nine consecutive "
-            "submit_claim transactions stalled in state processing with zero validator "
-            "votes committed, while deterministic writes on the same contracts "
-            "continued to decide normally. See DECISIONS.md D-010."
-        ),
-        "observedAtUtc": now(),
-    }
+    if claim_insufficient and indeterminate_index is not None:
+        claim = claims[indeterminate_index]
+        gates["G6"] = {
+            "gate": "G6",
+            "intent": (
+                "the reading is gathered successfully but contains no value that "
+                "could decide the asserted condition either way"
+            ),
+            "tx": record(claim_insufficient),
+            "claim": json.dumps(claim),
+            "verdict": claim["verdict"],
+            "pattern": claim["pattern"],
+            "pinnedReading": claim["pinnedReading"],
+            "statusAfter": claim["statusAfter"],
+            "statusNow": observed["targets"][claim["key"]]["status"],
+            "decidedByClassifier": claim["note"] == "",
+            "note": (
+                "The note is empty, so this INDETERMINATE came from the classifier "
+                "under the standard, not from the deterministic _reading_defect "
+                "guard. The reading was gathered cleanly: published_invariant "
+                "returned the invariant sentence and nothing failed. It simply "
+                "contains no number that could settle whether the invariant holds."
+            ),
+            "history": (
+                "This gate was blocked for part of the build by the Studio Next "
+                "outage in DECISIONS.md D-010. The transaction recorded here was "
+                "submitted during that outage, sat in processing for over 500 "
+                "seconds, and finalized once the network recovered. See the D-010 "
+                "addendum."
+            ),
+            "observedAtUtc": observed["observedAtUtc"],
+            "pass": claim["verdict"] == "INDETERMINATE"
+            and observed["targets"][claim["key"]]["status"] == "RUNNING",
+        }
+    else:
+        gates["G6"] = {
+            "gate": "G6",
+            "pass": None,
+            "blocked": True,
+            "reason": "No INDETERMINATE claim is recorded on chain. See DECISIONS.md D-010.",
+            "observedAtUtc": now(),
+        }
 
     unreadable = {
         "intent": "reading spec names a method the target does not expose",

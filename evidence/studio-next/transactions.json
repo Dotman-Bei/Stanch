@@ -3,6 +3,26 @@
     "explorer": "https://explorer-studio-dev.genlayer.com/address/0xe3C5B525a413797F86a2742C9C5d1502045EBC24",
     "transactions": [
       {
+        "txHash": "0x4bb362d16771806a51dfe701708c1bf5490de4f45e6ae8402a6fcb43274ea469",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x4bb362d16771806a51dfe701708c1bf5490de4f45e6ae8402a6fcb43274ea469",
+        "from": "0x11DDE75553F54aE146B9e1FECf319da7b819Eb45",
+        "to": "0xe3C5B525a413797F86a2742C9C5d1502045EBC24",
+        "calldata": "FgBkc3VibWl0X2NsYWltBGFyZ3MdrAFjaXN0ZXJuLWZpeGVkLWNvbnRyb2ykAnsibWV0aG9kcyI6IFsicHVibGlzaGVkX2ludmFyaWFudCJdfawEdGhlIHZhdWx0IGNsYWltYWJsZSB0b3RhbCBoYXMgYmVlbiBpbmZsYXRlZCBiZXlvbmQgd2hhdCB3YXMgZGVwb3NpdGVk",
+        "executionResult": "FINISHED_WITH_RETURN",
+        "consensusResult": null,
+        "lifecycle": null,
+        "isDeploy": false,
+        "leaderStatus": null,
+        "leaderPayload": "AAA=",
+        "validatorVotes": {
+          "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "idle",
+          "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree",
+          "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "disagree",
+          "0xcF5Fd792Df0Dc9d297af75c82B4A0011e8FA1A4A": "agree",
+          "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "agree"
+        }
+      },
+      {
         "txHash": "0x2ef44c08e33b296020eadd50e29ef7ab722efe9fd048d49a5b997416d47f9241",
         "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x2ef44c08e33b296020eadd50e29ef7ab722efe9fd048d49a5b997416d47f9241",
         "from": "0x11DDE75553F54aE146B9e1FECf319da7b819Eb45",
@@ -147,6 +167,26 @@
   "0x288aA7651e3260fA13B09bD86c7430FD52585f30": {
     "explorer": "https://explorer-studio-dev.genlayer.com/address/0x288aA7651e3260fA13B09bD86c7430FD52585f30",
     "transactions": [
+      {
+        "txHash": "0x4b0e920d932e772b0bddde893bf42fbc8d8f299ff7b1f0e27c370b50f31af8ed",
+        "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x4b0e920d932e772b0bddde893bf42fbc8d8f299ff7b1f0e27c370b50f31af8ed",
+        "from": "0x11DDE75553F54aE146B9e1FECf319da7b819Eb45",
+        "to": "0x288aA7651e3260fA13B09bD86c7430FD52585f30",
+        "calldata": "FgA8ZGVwb3NpdARhcmdzDQk=",
+        "executionResult": "FINISHED_WITH_ERROR",
+        "consensusResult": null,
+        "lifecycle": null,
+        "isDeploy": false,
+        "leaderStatus": null,
+        "leaderPayload": "AVNUQU5DSF9IQUxURUQ=",
+        "validatorVotes": {
+          "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "agree",
+          "0x6760cDeC573cf38568C59872ee48B6fED41F8A4c": "agree",
+          "0x8142E5D1b04f84c3cD995C25AAe31B31F8e0379E": "idle",
+          "0x8D32eb5D0207f7E230C45e7BF0D14B2ED5DA3028": "agree",
+          "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "idle"
+        }
+      },
       {
         "txHash": "0x03b82ac8b1fd216035e1893c1ccad3f4dc77387126f839f4180ebc23fe7b234d",
         "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x03b82ac8b1fd216035e1893c1ccad3f4dc77387126f839f4180ebc23fe7b234d",

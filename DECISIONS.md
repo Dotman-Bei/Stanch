@@ -192,7 +192,7 @@ three-way distinction survives in a two-colour system:
 Monospace with `tabular-nums` is kept for every address, hash and count, because
 that was a legibility rule rather than a colour rule.
 
-## D-006 — The §11 gate resolved: P3 passes, and the upstream defect only half reproduces
+## D1 — The §11 gate resolved: P3 passes, and the upstream defect only half reproduces
 
 **Run.** `tools/run_probes.py` against Studio Next. Raw output in `probes/results.json`.
 
@@ -423,7 +423,7 @@ the expectation by accident. The gate runner now records `claimCountBefore` and
 `claimCountAfter` around every claim, so a transaction that recorded nothing can
 no longer be read as a verdict about something.
 
-## D-010 — Studio Next stopped deciding non-deterministic transactions, and G6 is blocked by it
+## D-010 — Studio Next stopped deciding non-deterministic transactions, and G6 was blocked by it
 
 **Observed.** After the D-009 fix, `submit_claim` transactions stopped reaching a
 decision. Nine consecutive attempts across three gates, each waited out for
@@ -454,10 +454,12 @@ on the classification"* — the answer there is to narrow the standard. **K3** i
 This is K3 wearing K2's clothes, and narrowing the standard in response would have
 been changing the product to fix a network outage.
 
-**Decided.** G6 is recorded as **BLOCKED**, with the reason, in the README gate
-table and in `evidence/studio-next/g6-indeterminate.json`. It is not marked
-failed, because nothing was measured, and it is not omitted.
-`G6-INDETERMINATE-DISTINCT` stays `UNMEASURED` in the ledger.
+**Decided at the time.** G6 was recorded as **BLOCKED**, with the reason, in the
+README gate table and in `evidence/studio-next/g6-indeterminate.json`. It was not
+marked failed, because nothing had been measured, and it was not omitted.
+`G6-INDETERMINATE-DISTINCT` stayed `UNMEASURED` in the ledger.
+
+**Resolved.** See the second addendum below. The outage ended and G6 passed.
 
 **What was preserved, and how.** An earlier full gate run had already completed
 against STANCH at `0xe3C5B525a413797F86a2742C9C5d1502045EBC24`, and its results
@@ -504,7 +506,92 @@ claim_count before and after: 2
 ```
 
 `eth_blockNumber` answered normally throughout, and the claim list did not grow.
-The outage is specific to the non-deterministic path and outlasted the build
-window. Everything downstream of a verdict — G6, the injection attack in §20, and
-the verdict-pipeline tests — is therefore unmeasured on Studio Next and is labelled
-that way rather than being filled in from an earlier run.
+The outage was specific to the non-deterministic path. Everything downstream of a
+verdict — G6, the injection attack in §20, and the verdict-pipeline tests — was
+therefore unmeasured on Studio Next at that point, and was labelled that way
+rather than being filled in from an earlier run.
+
+### D-010 second addendum — the outage ended, and the re-probe is what passed G6
+
+The network recovered. The probe transaction above,
+`0x4bb362d16771806a51dfe701708c1bf5490de4f45e6ae8402a6fcb43274ea469`, was not
+resubmitted and was not abandoned. It finalized on its own:
+
+```
+lifecycle {'state': 'finalized', 'outcome': 'accepted'}
+result    MAJORITY_AGREE
+claim_count 2 -> 3
+```
+
+It carried the corrected G6 reading spec — `{"methods": ["published_invariant"]}`
+against the healthy control target — and its recorded verdict is
+**`INDETERMINATE`**, with the target still `RUNNING`.
+
+Two things make this the gate rather than a lucky consolation:
+
+1. **The note is empty.** A verdict produced by the deterministic
+   `_reading_defect` guard carries the defect string as its note. This one does
+   not, so the classifier decided it, under the standard, exactly as §12 Stage 2
+   describes.
+2. **The reading gathered cleanly.** `published_invariant` returned
+   `"total_claimable must never exceed total_deposited"`. Nothing failed. The
+   reading simply contains no number that could settle whether that invariant
+   holds — which is what "insufficient" has to mean if `INDETERMINATE` is to be
+   distinct from `CLEAR`.
+
+So all three verdicts now exist on chain against the same STANCH: `CLEAR` on the
+false claim, `EXPLOIT` on the true one, `INDETERMINATE` on the undecidable one.
+
+**What stays in the record regardless.** The outage happened, it lasted long
+enough to stall nine transactions and block a gate, and none of that is deleted
+now that it resolved. The standing caveat about consensus availability being an
+inherited failure mode is not softened: a halt authority that waits on consensus
+is unavailable exactly when consensus is, and this build watched that happen.
+
+## D-011 — A session-scoped fixture that halts a shared target made seven tests fail
+
+**Observed.** The first full-suite run after the outage lifted: **17 passed, 7
+failed.** The failures had a shape that did not match the contracts:
+
+```
+tests/test_registry.py::test_registration_binds_and_reports_running   FAILED
+tests/test_registry.py::test_rebinding_a_key_is_refused               PASSED
+tests/test_registry.py::test_target_reads_its_own_status_through_stanch FAILED
+```
+
+A test asserting a key is `RUNNING` failed while the test immediately after it,
+asserting a rebind is refused, passed. Nothing about registration is that
+selective.
+
+**Cause, and it was mine.** `conftest.py` had one session-scoped `cistern` and a
+session-scoped `halted` fixture that exploited *that same* contract and halted it.
+pytest collects alphabetically, so `test_guard_clause.py` ran first, pulled
+`halted`, and left the shared target `HALTED` for the rest of the session. Every
+later test that assumed a running target then failed, and the verdict-pipeline
+tests failed for the same reason.
+
+Read the other way round, the suite was reporting something true: the halt is
+irreversible and global to that key, and any test written as though it were not is
+wrong. But it was reporting it as seven red lines against working contracts.
+
+**Decided.** Targets are no longer shared between the two states:
+
+| Fixture | Scope | Guarantees |
+|---|---|---|
+| `cistern` | module | a registered target that **nothing in the fixture ever halts** |
+| `halted_cistern` | module | its **own** freshly deployed target, exploited and halted inside the fixture |
+
+Each module derives its registration keys from its own module name, so two modules
+cannot collide on a key and `register`'s bind-once rule cannot fire spuriously.
+A test that needs a halted target takes `halted_cistern`; a halt in one test can
+no longer become a precondition in another.
+
+`halted_cistern` also fails loudly rather than yielding a half-set-up target: if
+the true claim does not flip the status, it calls `pytest.fail` naming the status
+it actually saw and pointing at D-010, so a network stall is never reported as a
+contract defect.
+
+**The wider point.** This is the third time in this build that a green or red
+result meant something other than what it appeared to (D-008, D-009, and now
+this). Every time, the fix was to remove a shared assumption rather than to adjust
+an expectation.

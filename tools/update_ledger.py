@@ -87,8 +87,14 @@ def main() -> None:
     # ---- negative claims resting on source only
     promote("N2-NO-WRITE-PATH", "SUPPORTED", ["source_inspection"],
             ["evidence/source-inspection/n2-no-write-path.txt"])
-    promote("N1-NO-RESUME", "PARTIAL", ["source_inspection"],
-            ["evidence/source-inspection/n1-no-resume.txt"])
+    transcript = ROOT / "evidence" / "tests" / "transcript.txt"
+    full_suite = transcript.exists() and "failed" not in transcript.read_text()
+    promote(
+        "N1-NO-RESUME",
+        "SUPPORTED" if full_suite else "PARTIAL",
+        ["source_inspection", "local_test"] if full_suite else ["source_inspection"],
+        ["evidence/source-inspection/n1-no-resume.txt", "evidence/tests/transcript.txt"],
+    )
     promote("N3-NO-VALUE-CUSTODY", "PARTIAL", ["source_inspection"],
             ["evidence/source-inspection/n3-no-payable.txt"])
 
@@ -106,9 +112,19 @@ def main() -> None:
                 ["studio_next_observation"],
                 ["evidence/studio-next/g4-halted-revert.json"])
     if gate_passed("G6"):
-        promote("G6-INDETERMINATE-DISTINCT", "PARTIAL",
-                ["studio_next_observation", "publisher_claim"],
+        promote("G6-INDETERMINATE-DISTINCT", "SUPPORTED",
+                ["consensus_receipt", "studio_next_observation"],
                 ["evidence/studio-next/g6-indeterminate.json"])
+
+    campaign = load(STUDIO / "campaign.json")
+    attacks = campaign.get("attacks") or {}
+    if attacks and not campaign.get("anyAttackSucceeded"):
+        promote("INJECTION-RESISTANCE", "PARTIAL",
+                ["consensus_receipt", "studio_next_observation"],
+                ["evidence/studio-next/campaign.json"])
+        promote("REGISTRATION-SQUAT-HARMLESS", "SUPPORTED",
+                ["consensus_receipt", "studio_next_observation"],
+                ["evidence/studio-next/campaign.json"])
 
     if "P5" in probe_results:
         promote("N5-STANDARD-IMMUTABLE", "PARTIAL", ["studio_next_observation"],

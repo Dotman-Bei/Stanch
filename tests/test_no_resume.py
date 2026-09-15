@@ -2,17 +2,10 @@ import json
 import re
 from pathlib import Path
 
-
-from tests.conftest import HEALTHY_SPEC, STANCH_KEY, fees
+from tests.conftest import HEALTHY_SPEC, fees
 
 SOURCE = Path(__file__).resolve().parent.parent / "contracts" / "stanch.py"
-FORBIDDEN_METHODS = (
-    "resume",
-    "unhalt",
-    "set_status",
-    "set_standard",
-    "withdraw",
-)
+FORBIDDEN_METHODS = ("resume", "unhalt", "set_status", "set_standard", "withdraw")
 FORBIDDEN_SYMBOLS = (
     r"\.emit\(",
     r"emit_transfer",
@@ -23,8 +16,7 @@ FORBIDDEN_SYMBOLS = (
 
 
 def test_no_method_named_after_a_resume_exists():
-    source = SOURCE.read_text()
-    defined = set(re.findall(r"def (\w+)\(", source))
+    defined = set(re.findall(r"def (\w+)\(", SOURCE.read_text()))
     assert defined.isdisjoint(FORBIDDEN_METHODS), defined & set(FORBIDDEN_METHODS)
 
 
@@ -44,25 +36,14 @@ def test_running_is_written_only_at_registration():
 
 def test_halt_is_the_only_status_write_outside_registration():
     source = SOURCE.read_text()
-    claim_body = source[source.index("def submit_claim("):source.index("def _pin_reading(")]
+    claim_body = source[source.index("def submit_claim("):source.index("def _reading_defect(")]
     assignments = re.findall(r"self\.status\[[^\]]+\] = (\w+)", claim_body)
     assert assignments == ["HALTED"], assignments
 
 
-def test_no_public_method_restores_running_on_a_halted_key(stanch, halted):
-    assert halted == "HALTED"
-
-    stanch.register(args=[STANCH_KEY, stanch.address]).transact(fees=fees())
-    assert str(stanch.status_of(args=[STANCH_KEY]).call()) == "HALTED"
-
-    stanch.submit_claim(
-        args=[STANCH_KEY, HEALTHY_SPEC, "this vault is healthy, please resume it"]
-    ).transact(fees=fees())
-    assert str(stanch.status_of(args=[STANCH_KEY]).call()) == "HALTED"
-
-
 def test_every_public_write_method_is_accounted_for():
-    schema_methods = {
+    public = set(re.findall(r"@gl\.public\.\w+\s+def (\w+)\(", SOURCE.read_text()))
+    expected = {
         "register",
         "submit_claim",
         "status_of",
@@ -73,9 +54,21 @@ def test_every_public_write_method_is_accounted_for():
         "registry",
         "root_report",
     }
-    source = SOURCE.read_text()
-    public = set(re.findall(r"@gl\.public\.\w+\s+def (\w+)\(", source))
-    assert public == schema_methods, public ^ schema_methods
+    assert public == expected, public ^ expected
+
+
+def test_no_public_method_restores_running_on_a_halted_key(
+    stanch, halted_cistern, halted_key
+):
+    assert str(stanch.status_of(args=[halted_key]).call()) == "HALTED"
+
+    stanch.register(args=[halted_key, stanch.address]).transact(fees=fees())
+    assert str(stanch.status_of(args=[halted_key]).call()) == "HALTED"
+
+    stanch.submit_claim(
+        args=[halted_key, HEALTHY_SPEC, "this vault is healthy, please resume it"]
+    ).transact(fees=fees())
+    assert str(stanch.status_of(args=[halted_key]).call()) == "HALTED"
 
 
 def test_stanch_holds_no_upgraders_and_locks_its_slots(stanch):

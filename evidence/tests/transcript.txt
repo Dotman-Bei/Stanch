@@ -1,34 +1,37 @@
 STANCH test transcript
 network: Studio Next, chain 61997
-run:     2026-09-15T16:31:40Z
-commit:  fe46cf0f9371a4c526f29a7299a0386f4e6a1861
+run:     2026-09-15T17:15:41Z
+commit:  41a8614231ca9cdfce29ad20e4ff1da4130844f5
+command: gltest tests/ -v
 
-Tests that require a verdict are NOT in this transcript. They are blocked by
-the Studio Next outage recorded in DECISIONS.md D-010, and are listed at the
-bottom as unrun rather than omitted.
+Every test runs against Studio Next. Nothing here is mocked or local.
+Each module deploys its own targets and derives its registration keys from
+its own name, so a halt in one test is never a precondition in another.
+See DECISIONS.md D-011 for why that matters.
 
-$ gltest tests/test_registry.py -v
-tests/test_registry.py::test_unregistered_key_reads_unknown_not_running PASSED [ 20%]
-tests/test_registry.py::test_registration_binds_and_reports_running PASSED [ 40%]
-tests/test_registry.py::test_rebinding_a_key_is_refused PASSED           [ 60%]
-tests/test_registry.py::test_empty_key_is_refused PASSED                 [ 80%]
-tests/test_registry.py::test_target_reads_its_own_status_through_stanch PASSED [100%]
-============================== 5 passed in 52.52s ==============================
+tests/test_guard_clause.py::test_writes_succeed_while_running PASSED     [  4%]
+tests/test_guard_clause.py::test_target_refuses_its_own_writes_once_halted PASSED [  8%]
+tests/test_guard_clause.py::test_views_still_read_after_a_halt PASSED    [ 12%]
+tests/test_guard_clause.py::test_the_fixed_target_refuses_the_accrual_that_broke_the_demo PASSED [ 16%]
+tests/test_injection.py::test_instruction_shaped_text_in_a_reading_does_not_produce_exploit PASSED [ 20%]
+tests/test_no_resume.py::test_no_method_named_after_a_resume_exists PASSED [ 25%]
+tests/test_no_resume.py::test_no_write_path_symbol_appears_in_the_source PASSED [ 29%]
+tests/test_no_resume.py::test_running_is_written_only_at_registration PASSED [ 33%]
+tests/test_no_resume.py::test_halt_is_the_only_status_write_outside_registration PASSED [ 37%]
+tests/test_no_resume.py::test_every_public_write_method_is_accounted_for PASSED [ 41%]
+tests/test_no_resume.py::test_no_public_method_restores_running_on_a_halted_key PASSED [ 45%]
+tests/test_no_resume.py::test_stanch_holds_no_upgraders_and_locks_its_slots PASSED [ 50%]
+tests/test_registry.py::test_unregistered_key_reads_unknown_not_running PASSED [ 54%]
+tests/test_registry.py::test_registration_binds_and_reports_running PASSED [ 58%]
+tests/test_registry.py::test_rebinding_a_key_is_refused PASSED           [ 62%]
+tests/test_registry.py::test_empty_key_is_refused PASSED                 [ 66%]
+tests/test_registry.py::test_target_reads_its_own_status_through_stanch PASSED [ 70%]
+tests/test_verdict_pipeline.py::test_a_claim_records_the_reading_it_was_decided_on PASSED [ 75%]
+tests/test_verdict_pipeline.py::test_persuasive_prose_over_a_healthy_reading_does_not_halt PASSED [ 79%]
+tests/test_verdict_pipeline.py::test_a_gathered_but_undecidable_reading_returns_indeterminate_not_clear PASSED [ 83%]
+tests/test_verdict_pipeline.py::test_a_reading_spec_naming_a_missing_method_reverts_and_records_nothing PASSED [ 87%]
+tests/test_verdict_pipeline.py::test_a_claim_against_an_unregistered_key_halts_nothing PASSED [ 91%]
+tests/test_verdict_pipeline.py::test_a_malformed_reading_spec_halts_nothing PASSED [ 95%]
+tests/test_verdict_pipeline.py::test_a_violated_invariant_halts_the_target PASSED [100%]
 
-$ gltest tests/test_no_resume.py tests/test_guard_clause.py -v -k '<deterministic subset>'
-tests/test_no_resume.py::test_no_method_named_after_a_resume_exists PASSED [ 12%]
-tests/test_no_resume.py::test_no_write_path_symbol_appears_in_the_source PASSED [ 25%]
-tests/test_no_resume.py::test_running_is_written_only_at_registration PASSED [ 37%]
-tests/test_no_resume.py::test_halt_is_the_only_status_write_outside_registration PASSED [ 50%]
-tests/test_no_resume.py::test_every_public_write_method_is_accounted_for PASSED [ 62%]
-tests/test_no_resume.py::test_stanch_holds_no_upgraders_and_locks_its_slots PASSED [ 75%]
-tests/test_guard_clause.py::test_writes_succeed_while_running PASSED     [ 87%]
-tests/test_guard_clause.py::test_the_fixed_target_refuses_the_accrual_that_broke_the_demo PASSED [100%]
-================== 8 passed, 3 deselected in 95.79s (0:01:35) ==================
-
-NOT RUN — blocked by the outage in DECISIONS.md D-010, each needs a verdict:
-  tests/test_no_resume.py::test_no_public_method_restores_running_on_a_halted_key
-  tests/test_guard_clause.py::test_target_refuses_its_own_writes_once_halted
-  tests/test_guard_clause.py::test_views_still_read_after_a_halt
-  tests/test_verdict_pipeline.py  (all)
-  tests/test_injection.py        (all)
+  ======================== 24 passed in 824.00s (0:13:43) ========================

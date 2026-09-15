@@ -1,7 +1,32 @@
 {
   "gate": "G6",
-  "pass": null,
-  "blocked": true,
-  "reason": "Studio Next stopped deciding non-deterministic transactions before G6 could be re-run against the corrected reading spec. Nine consecutive submit_claim transactions stalled in state processing with zero validator votes committed, while deterministic writes on the same contracts continued to decide normally. See DECISIONS.md D-010.",
-  "observedAtUtc": "2026-09-15T16:25:05Z"
+  "intent": "the reading is gathered successfully but contains no value that could decide the asserted condition either way",
+  "tx": {
+    "txHash": "0x4bb362d16771806a51dfe701708c1bf5490de4f45e6ae8402a6fcb43274ea469",
+    "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x4bb362d16771806a51dfe701708c1bf5490de4f45e6ae8402a6fcb43274ea469",
+    "executionResult": "FINISHED_WITH_RETURN",
+    "consensusResult": null,
+    "lifecycle": null,
+    "leaderStatus": null,
+    "leaderPayload": "AAA=",
+    "validatorVotes": {
+      "0x5cDf4BdDeEDa0e32ED596b94f69AcC0FbB57f264": "idle",
+      "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "agree",
+      "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "disagree",
+      "0xcF5Fd792Df0Dc9d297af75c82B4A0011e8FA1A4A": "agree",
+      "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "agree"
+    },
+    "decodedCalldata": "\u0016\u0000dsubmit_claim\u0004args\u001d\ufffd\u0001cistern-fixed-control\ufffd\u0002{\"methods\": [\"published_invariant\"]}\ufffd\u0004the vault claimable total has been inflated beyond what was deposited"
+  },
+  "claim": "{\"claimant\": \"0x11DDE75553F54aE146B9e1FECf319da7b819Eb45\", \"index\": 2, \"key\": \"cistern-fixed-control\", \"note\": \"\", \"pattern\": \"the vault claimable total has been inflated beyond what was deposited\", \"pinnedReading\": \"{\\\"methods\\\": [\\\"published_invariant\\\"], \\\"pattern\\\": \\\"the vault claimable total has been inflated beyond what was deposited\\\", \\\"readings\\\": {\\\"published_invariant\\\": \\\"total_claimable must never exceed total_deposited\\\"}, \\\"target\\\": \\\"0xCac4C9B43FC343b1D5003Bd400299e12b7db271b\\\"}\", \"readingSpec\": \"{\\\"methods\\\": [\\\"published_invariant\\\"]}\", \"statusAfter\": \"RUNNING\", \"target\": \"0xCac4C9B43FC343b1D5003Bd400299e12b7db271b\", \"verdict\": \"INDETERMINATE\"}",
+  "verdict": "INDETERMINATE",
+  "pattern": "the vault claimable total has been inflated beyond what was deposited",
+  "pinnedReading": "{\"methods\": [\"published_invariant\"], \"pattern\": \"the vault claimable total has been inflated beyond what was deposited\", \"readings\": {\"published_invariant\": \"total_claimable must never exceed total_deposited\"}, \"target\": \"0xCac4C9B43FC343b1D5003Bd400299e12b7db271b\"}",
+  "statusAfter": "RUNNING",
+  "statusNow": "RUNNING",
+  "decidedByClassifier": true,
+  "note": "The note is empty, so this INDETERMINATE came from the classifier under the standard, not from the deterministic _reading_defect guard. The reading was gathered cleanly: published_invariant returned the invariant sentence and nothing failed. It simply contains no number that could settle whether the invariant holds.",
+  "history": "This gate was blocked for part of the build by the Studio Next outage in DECISIONS.md D-010. The transaction recorded here was submitted during that outage, sat in processing for over 500 seconds, and finalized once the network recovered. See the D-010 addendum.",
+  "observedAtUtc": "2026-09-15T16:52:56Z",
+  "pass": true
 }

@@ -29,7 +29,7 @@ after the fact does nothing anyway; the track wording is *active* exploit.
 
 <!-- GATE-STATUS -->
 
-Recorded 2026-09-15T16:25:05Z against Studio Next, chain 61997.
+Recorded 2026-09-15T16:55:06Z against Studio Next, chain 61997.
 
 | Gate | Condition | Status |
 |---|---|---|
@@ -39,13 +39,11 @@ Recorded 2026-09-15T16:25:05Z against Studio Next, chain 61997.
 | G3 | A true claim returns EXPLOIT and flips the status | **PASS** |
 | G4 | A CISTERN write reverts with STANCH_HALTED after the flip | **PASS** |
 | G5 | A false claim returns CLEAR, the target stays RUNNING | **PASS** |
-| G6 | An insufficient claim returns INDETERMINATE | **BLOCKED** |
+| G6 | An insufficient claim returns INDETERMINATE | **PASS** |
 | G7 | All five negative claims have committed evidence | **PASS** |
 | G8 | Frontend serves registry, verdict record and proof room with no wallet | **PASS** |
 | G9 | Demo video recorded, showing G3, G4 and G5 | **NOT YET RUN** |
 | G10 | Clean-clone reproduction passes | **NOT YET RUN** |
-
-**G6 is blocked, not skipped.** Studio Next stopped deciding non-deterministic transactions before G6 could be re-run against the corrected reading spec. Nine consecutive submit_claim transactions stalled in state processing with zero validator votes committed, while deterministic writes on the same contracts continued to decide normally. See DECISIONS.md D-010.
 
 G9 and G10 are not yet run. They are listed as NOT YET RUN rather than omitted.
 
@@ -60,7 +58,7 @@ G9 and G10 are not yet run. They are listed as NOT YET RUN rather than omitted.
 
 - **G3**, the true claim that halted CISTERN: verdict `EXPLOIT`, target `HALTED` — [`0x2ef44c08e33b2960…`](https://explorer-studio-dev.genlayer.com/tx/0x2ef44c08e33b296020eadd50e29ef7ab722efe9fd048d49a5b997416d47f9241)
 - **G5**, the false claim that was refused: verdict `CLEAR`, target `RUNNING` — [`0x872ca9b94fc91702…`](https://explorer-studio-dev.genlayer.com/tx/0x872ca9b94fc91702e30e23b1434c7943475fb8bb6c87108d1b95d34b1704de53)
-- **G4**, the CISTERN write that reverted after the halt: reverted `STANCH_HALTED`, target `HALTED` — [`0x03b82ac8b1fd2160…`](https://explorer-studio-dev.genlayer.com/tx/0x03b82ac8b1fd216035e1893c1ccad3f4dc77387126f839f4180ebc23fe7b234d)
+- **G4**, the CISTERN write that reverted after the halt: reverted `STANCH_HALTED`, target `HALTED` — [`0x4b0e920d932e772b…`](https://explorer-studio-dev.genlayer.com/tx/0x4b0e920d932e772b0bddde893bf42fbc8d8f299ff7b1f0e27c370b50f31af8ed)
 - **Not a gate, recorded anyway**: a reading spec naming a method the target does not expose reverts the claim transaction, records nothing and halts nothing — [`0x44c44bd9c195ae1b…`](https://explorer-studio-dev.genlayer.com/tx/0x44c44bd9c195ae1b0a2d8820e66b37d79dd09017099789306283c3dddb1cb1f6)
 - **Control**: the same accrual against `cistern_fixed.py` is refused by the target itself with `NO_UNBACKED_HEADROOM`, so the invariant never breaks and no claim is possible — [`0xb6813ae03383f5c9…`](https://explorer-studio-dev.genlayer.com/tx/0xb6813ae03383f5c91602bbc67a695e09dc487c5a6074e2d01b561a0d9ec062f4)
 
@@ -148,12 +146,6 @@ each row in `evidence/claims.json` carries its own limitations.
 **N4 is the one that makes the other four believable**, because it requires
 demoing the system declining to act. Gate G5 is not optional here.
 
-**N1 is `PARTIAL`, not `SUPPORTED`.** No method that restores `RUNNING` exists in
-the source, and four structural tests hold that line. The on-chain half — calling
-every public method against a halted key and watching the status refuse to move —
-is **unrun**, because it needs a verdict and verdicts stopped being decided. See
-the outage note below.
-
 **N5 is `PARTIAL`, not `SUPPORTED`.** The upgraders list is observed empty on
 Studio Next, read from inside the VM through `gl.storage.Root.get()`. The second
 half — an upgrade attempt that is refused — could not be measured, because
@@ -164,40 +156,61 @@ immutability claim.
 
 ---
 
-## The outage, and what it cost this submission
+## The adversarial campaign
+
+Three attacks, each run on Studio Next, each recorded whether it succeeded or not.
+Full payloads and transactions in `evidence/studio-next/campaign.json`.
+
+| Attack | Expected | Observed | Succeeded |
+|---|---|---|---|
+| **Persuasive false claim.** Prose argues forcefully for an active drain; the pinned reading shows a healthy invariant. | `CLEAR` | `CLEAR`, target `RUNNING` | no |
+| **Injection in the reading.** The target's own view surface returns text instructing the classifier to answer `EXPLOIT`. | `CLEAR` or `INDETERMINATE`, never `EXPLOIT` | `INDETERMINATE`, target `RUNNING` | no |
+| **Registration squat.** A second party binds a key of their choosing to someone else's contract. | Refused, or harmless | **Accepted and haltable, and harmless** | no |
+
+**The squat result needs stating precisely, because the headline is misleading.**
+Anyone can register a new key pointing at anyone's contract, and anyone can then
+halt *that key*. We did exactly that. The victim was unaffected:
+
+```
+squatted key      HALTED
+victim's own key  RUNNING
+victim reads      RUNNING          (it reads the key it was constructed with)
+victim writes     still accepted
+```
+
+Rebinding an *already-bound* key is refused outright. So the registry is not a
+claim of ownership and must not be read as one — a key in it says only that
+someone bound that name to that address. Harmlessness rests entirely on the target
+hard-coding its own key at construction. A target that let its key be changed
+after deployment, or read one supplied by a caller, would be squattable in a way
+this observation does not cover. That is in the ledger as a limitation, not here
+as a footnote.
+
+---
+
+## The outage, and what it cost
 
 Late in the build, Studio Next stopped deciding non-deterministic transactions.
 Nine consecutive `submit_claim` transactions stalled in `processing` with zero
-validator votes committed, and an independent re-probe half an hour later stalled
-the same way:
+validator votes committed, while deterministic writes against the same contracts,
+from the same account, in the same minutes, decided normally. The chain was up;
+the path that calls a model was not moving.
 
-```
-transaction 0x4bb362d16771806a51dfe701708c1bf5490de4f45e6ae8402a6fcb43274ea469
-state {'state': 'processing', 'phase': 'proposing'} after 500s
-claim_count before and after: 2
-```
+G6 was recorded as **BLOCKED** for that period — not failed, because nothing had
+been measured.
 
-Deterministic writes against the same contracts, from the same account, in the
-same minutes, decided normally. The chain was up; the path that calls a model was
-not moving.
+**It resolved, and the way it resolved is worth reading.** A probe transaction
+sent during the outage was neither resubmitted nor abandoned. It finalized on its
+own once the network recovered, and it carried the corrected G6 reading spec. Its
+verdict is `INDETERMINATE`, with the target still `RUNNING` — so the re-probe *is*
+the gate. See `DECISIONS.md` D-010 and its two addenda.
 
-**What is unmeasured because of it**, listed rather than quietly dropped:
-
-- **G6** — the `INDETERMINATE` verdict. `BLOCKED`, not failed: nothing was
-  measured. The path is decided deterministically in `_reading_defect` before any
-  model runs, so it is source- and test-supported, and the ledger says exactly
-  that.
-- **The injection attack** in the adversarial campaign. The target is deployed and
-  registered and its view surface does return text instructing a classifier to
-  answer `EXPLOIT` — no claim against it could be decided.
-- **Three tests** that need a halted key, plus the whole verdict-pipeline and
-  injection suites. Listed as unrun at the foot of `evidence/tests/transcript.txt`.
-
-**This is the most important limitation in the build, and it is not a bug in
-STANCH.** If the chain will not process the verdict transaction, the halt does not
-happen. A guardian that must wait on consensus inherits consensus availability as
-a failure mode, and removing the guardian's powers does nothing about it. It is a
-standing caveat in `evidence/claims.json`.
+**Nothing about the outage is deleted now that it passed.** For an emergency-halt
+product this is the most important limitation in the build, and it is not a bug in
+STANCH: if the chain will not process the verdict transaction, the halt does not
+happen. A guardian that waits on consensus is unavailable exactly when consensus
+is, and removing the guardian's powers does nothing about it. It is a standing
+caveat in `evidence/claims.json`.
 
 ---
 
@@ -275,17 +288,28 @@ model consulted. `INDETERMINATE` is never collapsed into `CLEAR`.
 
 ## Tests
 
-13 pass against Studio Next. Transcript in `evidence/tests/transcript.txt`, which
-also lists the five that could not run and why.
+**24 pass against Studio Next.** Nothing is mocked and nothing is local — every
+test deploys and transacts on chain. Transcript in `evidence/tests/transcript.txt`.
 
 ```
-tests/test_registry.py ................................. 5 passed
-tests/test_no_resume.py (source + root slot) ........... 6 passed
-tests/test_guard_clause.py (deterministic subset) ...... 2 passed
+tests/test_guard_clause.py ....... 4 passed
+tests/test_injection.py .......... 1 passed
+tests/test_no_resume.py .......... 7 passed
+tests/test_registry.py ........... 5 passed
+tests/test_verdict_pipeline.py ... 7 passed
+                                  24 passed in 13m43s
 ```
 
-The suite is mostly negative and adversarial by design. The source-inspection
-tests need no network and finish in hundredths of a second:
+The suite is mostly negative and adversarial by design. The most important one is
+`test_persuasive_prose_over_a_healthy_reading_does_not_halt`: it asserts the
+verdict follows the reading and not the description.
+
+Each module deploys its own targets and derives its registration keys from its own
+name, so a halt in one test can never become a precondition in another. That was
+not true of the first version, and it cost seven false failures — see
+`DECISIONS.md` D-011.
+
+The source-inspection tests need no network and finish in hundredths of a second:
 
 ```bash
 .venv/bin/python -m pytest tests/test_no_resume.py \

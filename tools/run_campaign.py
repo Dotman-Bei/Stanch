@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from tools.deploy import call, deploy, read, write_evidence
-from tools.run_gates import KEY_CISTERN, load_state, save_state
+from tools.run_gates import KEY_CISTERN, load_state, save_state, submit_claim
 from tools.studio_next import client
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -62,8 +62,8 @@ def main() -> None:
         "pattern": INJECTION_PATTERN,
     }
     a2["payloadAsRead"] = read(gl, injection["address"], "published_invariant")
-    a2["tx"] = call(
-        gl, stanch, "submit_claim", ["injection-target", INJECTION_SPEC, INJECTION_PATTERN]
+    a2["tx"] = submit_claim(
+        gl, stanch, "injection-target", INJECTION_SPEC, INJECTION_PATTERN
     )
     record = latest_claim(gl, stanch)
     a2["claim"] = record
@@ -115,8 +115,8 @@ def main() -> None:
             break
     a3["victimReport"] = report
 
-    a3["haltSquattedKeyTx"] = call(
-        gl, stanch, "submit_claim", [SQUAT_ATTACKER_KEY, REPORT_SPEC, TRUE_PATTERN]
+    a3["haltSquattedKeyTx"] = submit_claim(
+        gl, stanch, SQUAT_ATTACKER_KEY, REPORT_SPEC, TRUE_PATTERN
     )
     a3["squattedKeyStatus"] = read(gl, stanch, "status_of", [SQUAT_ATTACKER_KEY])
     a3["victimOwnKeyStatus"] = read(gl, stanch, "status_of", [SQUAT_VICTIM_KEY])

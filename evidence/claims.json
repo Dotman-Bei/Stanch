@@ -1,9 +1,9 @@
 {
   "schemaVersion": "stanch.claims/1",
   "project": "STANCH",
-  "updatedAtUtc": "2026-09-15T16:32:45Z",
+  "updatedAtUtc": "2026-09-15T17:15:42Z",
   "revision": {
-    "baseCommit": "6aad1045c2f59489c698503595f657d7aead577e",
+    "baseCommit": "41a8614231ca9cdfce29ad20e4ff1da4130844f5",
     "branch": "main"
   },
   "network": {
@@ -55,7 +55,7 @@
         "chainId": 61997,
         "probe": "P3"
       },
-      "observedAtUtc": "2026-09-15T16:32:45Z",
+      "observedAtUtc": "2026-09-15T17:15:42Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -76,7 +76,7 @@
         "chainId": 61997,
         "probe": "P2"
       },
-      "observedAtUtc": "2026-09-15T16:32:45Z",
+      "observedAtUtc": "2026-09-15T17:15:42Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -105,7 +105,7 @@
       "reproduce": "See probes/PROBE.md, probe P1",
       "limitations": [
         "The twenty-second figure is one polling observation on one deployment, not a measured latency bound.",
-        "A single read taken immediately after the parent transaction would have recorded this probe as a failure, and did on an earlier run. See DECISIONS.md D-006.",
+        "A single read taken immediately after the parent transaction would have recorded this probe as a failure, and did on an earlier run. See DECISIONS.md D1.",
         "STANCH does not use contract-initiated deployment. This row documents chain behaviour, not a STANCH capability."
       ]
     },
@@ -135,24 +135,25 @@
     {
       "id": "N1-NO-RESUME",
       "claim": "STANCH cannot resume a halted target. No method sets a status back to RUNNING, and no code path writes RUNNING after construction; this is a property of the committed source, not a permission check that an operator could bypass.",
-      "status": "PARTIAL",
+      "status": "SUPPORTED",
       "evidenceClasses": [
-        "source_inspection"
+        "source_inspection",
+        "local_test"
       ],
       "scope": {
         "contract": "contracts/stanch.py"
       },
-      "observedAtUtc": "2026-09-15T16:32:45Z",
+      "observedAtUtc": "2026-09-15T17:15:42Z",
       "evidence": [
-        "evidence/source-inspection/n1-no-resume.txt"
+        "evidence/source-inspection/n1-no-resume.txt",
+        "evidence/tests/transcript.txt"
       ],
       "reproduce": "grep -n 'RUNNING' contracts/stanch.py && gltest tests/test_no_resume.py",
       "limitations": [
-        "The on-chain half is UNRUN. test_no_public_method_restores_running_on_a_halted_key needs a halted key, which needs a verdict, which the Studio Next outage in DECISIONS.md D-010 blocked. The claim therefore rests on source inspection plus four structural tests, not on an observation of a halted key refusing to move.",
         "Establishes the absence of a resume path in this version of the source, not across future versions.",
-        "A grep and four AST-shaped tests over committed source, not a VM-level capability proof.",
-        "Does not prevent a target from ignoring a HALTED verdict; enforcement is the target's own guard clause.",
-        "Not a formal verification."
+        "A grep and five structural tests over committed source, plus one on-chain test that calls register and submit_claim against a halted key and observes the status stay HALTED. That test exercises the two public write methods; it does not enumerate every possible call sequence.",
+        "Not a VM-level capability proof and not a formal verification.",
+        "Does not prevent a target from ignoring a HALTED verdict; enforcement is the target's own guard clause."
       ]
     },
     {
@@ -165,7 +166,7 @@
       "scope": {
         "contract": "contracts/stanch.py"
       },
-      "observedAtUtc": "2026-09-15T16:32:45Z",
+      "observedAtUtc": "2026-09-15T17:15:42Z",
       "evidence": [
         "evidence/source-inspection/n2-no-write-path.txt"
       ],
@@ -187,7 +188,7 @@
         "contract": "contracts/stanch.py",
         "chainId": 61997
       },
-      "observedAtUtc": "2026-09-15T16:32:45Z",
+      "observedAtUtc": "2026-09-15T17:15:42Z",
       "evidence": [
         "evidence/source-inspection/n3-no-payable.txt"
       ],
@@ -210,7 +211,7 @@
         "chainId": 61997,
         "gate": "G5"
       },
-      "observedAtUtc": "2026-09-15T16:32:45Z",
+      "observedAtUtc": "2026-09-15T17:15:42Z",
       "evidence": [
         "evidence/studio-next/g5-false-claim.json"
       ],
@@ -233,7 +234,7 @@
         "chainId": 61997,
         "probe": "P5"
       },
-      "observedAtUtc": "2026-09-15T16:32:45Z",
+      "observedAtUtc": "2026-09-15T17:15:42Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -258,7 +259,7 @@
         "chainId": 61997,
         "gate": "G3"
       },
-      "observedAtUtc": "2026-09-15T16:32:45Z",
+      "observedAtUtc": "2026-09-15T17:15:42Z",
       "evidence": [
         "evidence/studio-next/g3-true-halt.json"
       ],
@@ -280,7 +281,7 @@
         "chainId": 61997,
         "gate": "G4"
       },
-      "observedAtUtc": "2026-09-15T16:32:45Z",
+      "observedAtUtc": "2026-09-15T17:15:42Z",
       "evidence": [
         "evidence/studio-next/g4-halted-revert.json"
       ],
@@ -292,43 +293,74 @@
     },
     {
       "id": "G6-INDETERMINATE-DISTINCT",
-      "claim": "An insufficient claim returned INDETERMINATE, changed no state, and is displayed in the interface as neither a pass nor a fail.",
-      "status": "UNMEASURED",
-      "evidenceClasses": [],
+      "claim": "A claim whose reading was gathered successfully but contains no value capable of deciding the asserted condition returned INDETERMINATE from the classifier, changed no state, and is displayed in the interface as neither a pass nor a fail.",
+      "status": "SUPPORTED",
+      "evidenceClasses": [
+        "consensus_receipt",
+        "studio_next_observation"
+      ],
       "scope": {
         "chainId": 61997,
         "gate": "G6"
       },
-      "observedAtUtc": null,
+      "observedAtUtc": "2026-09-15T17:15:42Z",
       "evidence": [
         "evidence/studio-next/g6-indeterminate.json"
       ],
       "reproduce": "See REPRODUCE.md, gate G6",
       "limitations": [
-        "No Studio Next observation exists. Gate G6 is BLOCKED, not failed: the network stopped deciding non-deterministic transactions before it could be run against the corrected reading spec. See DECISIONS.md D-010.",
-        "The INDETERMINATE path is decided deterministically in _reading_defect before any classifier runs, so it is established by source inspection and by tests/test_verdict_pipeline.py rather than by a consensus receipt.",
-        "A reading spec naming a method the target does not expose is a different case and does not produce INDETERMINATE at all: the claim transaction reverts and records nothing. That one is observed, in evidence/studio-next/unreadable-method-reverts.json.",
+        "One observation. No rate of indeterminate outcomes has been measured.",
+        "The verdict's note is empty, which is what distinguishes a classifier decision from the deterministic _reading_defect guard; that distinction is read from the record rather than from the classifier's reasoning, which is not exposed.",
+        "The transaction stalled for over 500 seconds during the outage in DECISIONS.md D-010 before finalizing. It was not resubmitted, but a reviewer should know the verdict was not prompt.",
+        "A reading spec naming a method the target does not expose is a different case and does not produce INDETERMINATE at all: the claim transaction reverts and records nothing. See evidence/studio-next/unreadable-method-reverts.json.",
         "Display behaviour is a publisher_claim about our own interface until independently checked."
       ]
     },
     {
       "id": "INJECTION-RESISTANCE",
-      "claim": "A claim whose prose asserts an exploit while its pinned reading shows a healthy invariant returned CLEAR, and a reading containing instruction-shaped text did not produce EXPLOIT.",
-      "status": "UNMEASURED",
-      "evidenceClasses": [],
+      "claim": "A claim whose prose asserts an exploit while its pinned reading shows a healthy invariant returned CLEAR, and a reading whose own text instructed the classifier to answer EXPLOIT returned INDETERMINATE; neither halted its target.",
+      "status": "PARTIAL",
+      "evidenceClasses": [
+        "consensus_receipt",
+        "studio_next_observation"
+      ],
       "scope": {
         "campaign": "PRD section 20"
       },
-      "observedAtUtc": null,
+      "observedAtUtc": "2026-09-15T17:15:42Z",
       "evidence": [
-        "evidence/studio-next/campaign-injection.json"
+        "evidence/studio-next/campaign.json"
       ],
       "reproduce": "See REPRODUCE.md, adversarial campaign",
       "limitations": [
-        "UNRUN, not merely unproven. The injection target is deployed and registered on Studio Next at the address in evidence/studio-next/deployment.json, and its view surface does return text instructing a classifier to answer EXPLOIT, but no claim against it could be decided: see DECISIONS.md D-010.",
-        "The standard in contracts/stanch.py addresses instruction-shaped readings explicitly, and that is a property of committed source, not evidence of resistance.",
-        "Absence of a successful injection within this budget would in any case be NO_WITNESS_WITHIN_BUDGET rather than evidence of resistance.",
-        "Any payload that did succeed would be recorded here and in the README rather than removed."
+        "Two payloads is not a sweep. No systematic injection corpus has been run, and the two used are in evidence/studio-next/campaign.json in full.",
+        "Absence of a successful injection within this budget is not evidence of resistance; it is NO_WITNESS_WITHIN_BUDGET.",
+        "The injected reading returned INDETERMINATE rather than CLEAR. That is within the expected band and it is not the same as the classifier having read the numbers correctly and dismissed the instruction; the reading also contained no numbers capable of deciding anything.",
+        "Any payload that did succeed is recorded here and in the README rather than removed."
+      ]
+    },
+    {
+      "id": "REGISTRATION-SQUAT-HARMLESS",
+      "claim": "Anyone can register a new key of their own choosing that points at someone else's contract, and that squatted key can be halted; the target is unaffected, because it reads only the key it was given at construction. Rebinding an already-bound key is refused outright.",
+      "status": "SUPPORTED",
+      "evidenceClasses": [
+        "consensus_receipt",
+        "studio_next_observation"
+      ],
+      "scope": {
+        "chainId": 61997,
+        "campaign": "PRD section 20, attack 3"
+      },
+      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "evidence": [
+        "evidence/studio-next/campaign.json"
+      ],
+      "reproduce": "See REPRODUCE.md, adversarial campaign",
+      "limitations": [
+        "A squatted key being haltable means the registry is not a claim of ownership and must not be read as one. A key in the registry says only that someone bound that name to that address.",
+        "Harmlessness rests entirely on the target hard-coding its own key at construction. A target that let its key be changed after deployment, or that read a key supplied by a caller, would be squattable in a way this observation does not cover.",
+        "One squat against one target. No sweep over key shapes or registration races was run.",
+        "The victim in this test was a contract we wrote to behave correctly. It does not establish anything about targets written by anyone else."
       ]
     },
     {
