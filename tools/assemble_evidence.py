@@ -70,9 +70,33 @@ def main() -> None:
     fixed_deploy = find(FIXED, lambda tx, _: tx["isDeploy"])
     injection_deploy = find(INJECTION, lambda tx, _: tx["isDeploy"])
 
-    reg_demo = find(STANCH, lambda tx, c: "register" in c and "cistern-demo" in c)
-    reg_fixed = find(STANCH, lambda tx, c: "register" in c and "cistern-fixed" in c)
-    reg_injection = find(STANCH, lambda tx, c: "register" in c and "injection" in c)
+    def registration_for(key: str, target: str | None = None):
+        """Find the register transaction that actually bound this key.
+
+        Three things have to hold, and the third was learned the hard way. The
+        adversarial campaign attempted to rebind `squat-victim-own-key` to a
+        different address; that attempt was correctly refused, but it is still a
+        register call naming that key, and matching on the key alone returned it.
+        Reporting a refused transaction as the one that bound a key would be
+        simply false, so the match also requires the transaction to have
+        succeeded and to name the address the key currently points at.
+        """
+        for tx in rows(STANCH):
+            calldata = readable(tx.get("calldata") or "")
+            if "register" not in calldata or "submit_claim" in calldata:
+                continue
+            if key not in calldata:
+                continue
+            if tx.get("executionResult") != "FINISHED_WITH_RETURN":
+                continue
+            if target and target[2:].lower() not in calldata.lower():
+                continue
+            return tx
+        return None
+
+    reg_demo = registration_for("cistern-demo")
+    reg_fixed = registration_for("cistern-fixed-control")
+    reg_injection = registration_for("injection-target")
 
     claim_true = find(
         STANCH,
@@ -134,6 +158,20 @@ def main() -> None:
         "cistern-fixed-control", ["published_invariant"], "INDETERMINATE"
     )
 
+    # Every key in the live registry, not a hardcoded three. The sandbox and
+    # campaign keys were registered by later tooling, and without this their
+    # "bound by" column renders "not recorded" even though the transaction is on
+    # chain and recoverable.
+    registrations = {}
+    for row in observed["registry"]["targets"]:
+        key = row["key"]
+        tx = registration_for(key, row["target"])
+        registrations[key] = {
+            "target": row["target"],
+            "statusNow": row["status"],
+            "tx": record(tx) if tx else None,
+        }
+
     deployment = {
         "network": {"name": "Studio Next", "chainId": 61997},
         "assembledAtUtc": now(),
@@ -153,14 +191,7 @@ def main() -> None:
             "address": INJECTION,
             "addressExplorer": explorer_address(INJECTION),
         },
-        "registrations": {
-            "cistern-demo": {"tx": record(reg_demo), "target": CISTERN,
-                             "statusAfter": "RUNNING"},
-            "cistern-fixed-control": {"tx": record(reg_fixed), "target": FIXED,
-                                      "statusAfter": "RUNNING"},
-            "injection-target": {"tx": record(reg_injection), "target": INJECTION,
-                                 "statusAfter": "RUNNING"},
-        },
+        "registrations": registrations,
         "gates": {},
     }
 

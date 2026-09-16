@@ -17,9 +17,9 @@
     },
     "decodedCalldata": "\u0016\u0000dsubmit_claim\u0004args\u001ddcistern-demo\ufffd\u0002{\"methods\": [\"oracle_price_feed_history\"]}\ufffd\u0002the oracle price feed has been manipulated"
   },
-  "claimCountNow": 3,
+  "claimCountNow": 7,
   "statusAfter": "HALTED",
   "reverted": true,
   "note": "The claim transaction reverts with exit_code 1 rather than producing a verdict: calling a method the callee does not expose aborts the GenVM run. Nothing is recorded and nothing is halted.",
-  "observedAtUtc": "2026-09-15T16:52:56Z"
+  "observedAtUtc": "2026-09-16T12:07:03Z"
 }

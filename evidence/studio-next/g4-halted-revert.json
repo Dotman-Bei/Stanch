@@ -3,6 +3,40 @@
   "statusSeenByTarget": "HALTED",
   "blockedWrites": [
     {
+      "txHash": "0xf139ff9e681d8fc65eb3ed81caf119cb691225e2c36425a9f6f9f007740ea3fa",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xf139ff9e681d8fc65eb3ed81caf119cb691225e2c36425a9f6f9f007740ea3fa",
+      "executionResult": "FINISHED_WITH_ERROR",
+      "consensusResult": null,
+      "lifecycle": null,
+      "leaderStatus": null,
+      "leaderPayload": "STANCH_HALTED",
+      "validatorVotes": {
+        "0x05d8aFc66B515038712537f99cAAEA73d16f0007": "idle",
+        "0x1dA3a7de8EA65A318bf88Eb63d3dC55295Dd257E": "agree",
+        "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+        "0xEEcEC5D1E07Ee40f5cb85aF922178Dc01278013C": "idle",
+        "0xf13c3DfE38C8E206C33F750C24a1b043b63Cb810": "agree"
+      },
+      "decodedCalldata": "\u0016\u0000<deposit\u0004args\r\t"
+    },
+    {
+      "txHash": "0xb1d36d2b383bb1df66d23161e0ec93de2e3d77625ad81a0e272e9c1a912940bb",
+      "explorer": "https://explorer-studio-dev.genlayer.com/tx/0xb1d36d2b383bb1df66d23161e0ec93de2e3d77625ad81a0e272e9c1a912940bb",
+      "executionResult": "FINISHED_WITH_ERROR",
+      "consensusResult": null,
+      "lifecycle": null,
+      "leaderStatus": null,
+      "leaderPayload": "STANCH_HALTED",
+      "validatorVotes": {
+        "0x5A4230B920b18c4AFD3A28F99Eae669B7F2cdC1e": "idle",
+        "0xE4E106086F167D75E2270fa5f3680f6ac598d179": "agree",
+        "0xE52dDB85587585930b1E5f1Fe88fef21CcA49829": "agree",
+        "0xcEf1Baa172d0b4D99Dcc505B36332F26D1088025": "agree",
+        "0xcbC79F96B7A275b23EE64d80a98325107F6E1b77": "idle"
+      },
+      "decodedCalldata": "\u0016\u0000<deposit\u0004args\r\t"
+    },
+    {
       "txHash": "0x4b0e920d932e772b0bddde893bf42fbc8d8f299ff7b1f0e27c370b50f31af8ed",
       "explorer": "https://explorer-studio-dev.genlayer.com/tx/0x4b0e920d932e772b0bddde893bf42fbc8d8f299ff7b1f0e27c370b50f31af8ed",
       "executionResult": "FINISHED_WITH_ERROR",
@@ -56,6 +90,6 @@
   ],
   "revertReason": "STANCH_HALTED",
   "vaultReportAfter": "{\"accrual_calls\": \"1\", \"excess_claimable\": \"250\", \"invariant\": \"total_claimable must never exceed total_deposited\", \"stanch\": \"0xe3C5B525a413797F86a2742C9C5d1502045EBC24\", \"stanch_key\": \"cistern-demo\", \"total_claimable\": \"1250\", \"total_deposited\": \"1000\"}",
-  "observedAtUtc": "2026-09-15T16:52:56Z",
+  "observedAtUtc": "2026-09-16T12:07:03Z",
   "pass": true
 }
