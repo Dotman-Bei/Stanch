@@ -45,6 +45,7 @@ export default async function RegistryPage() {
   return (
     <>
       <Hero />
+      <HowItWorks />
       <Section className="mt-12">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -64,23 +65,6 @@ export default async function RegistryPage() {
         {limited ? <RateLimited detail={limited} /> : null}
       {error ? <ReadFailed detail={error} /> : null}
         {configured && !error && !limited ? <RegistryTable rows={rows} /> : null}
-      </Section>
-
-      <Section className="mt-12">
-        <div className="grid gap-5 [&>*]:min-w-0 md:grid-cols-3">
-          <Power title="What it can do" tone="volt">
-            Publish one verdict about one registered key, once.
-          </Power>
-          <Power title="What it cannot do">
-            Resume a halt. Upgrade a target. Change a target&apos;s parameters. Hold or
-            move value. Write to anything it can halt.
-          </Power>
-          <Power title="Who enforces it">
-            The target. Every write method in CISTERN reads{" "}
-            <Mono>status_of()</Mono> synchronously and refuses itself if the answer is{" "}
-            <Mono>HALTED</Mono>.
-          </Power>
-        </div>
       </Section>
 
       <Section className="mt-12">
@@ -223,24 +207,101 @@ function RegistryTable({ rows }: { rows: RegistryRow[] }) {
   );
 }
 
-function Power({
-  title,
-  children,
-  tone = "plain",
-}: {
-  title: string;
-  children: React.ReactNode;
-  tone?: "plain" | "volt";
-}) {
+const STEPS = [
+  {
+    n: "01",
+    title: "Anyone can claim",
+    body: (
+      <>
+        No permission, no allowlist. You name a registered target, the view methods
+        STANCH should read, and the pattern you assert is present.
+      </>
+    ),
+    chip: "submit_claim(key, spec, pattern)",
+  },
+  {
+    n: "02",
+    title: "STANCH reads the target",
+    body: (
+      <>
+        It calls the target&apos;s own public view methods and pins the bytes. This is
+        deterministic, so every validator re-executes it and disagreement fails
+        consensus before a verdict exists.
+      </>
+    ),
+    chip: "get_at(addr).view()",
+  },
+  {
+    n: "03",
+    title: "Validators classify",
+    body: (
+      <>
+        Each derives a verdict independently from those bytes — never from your
+        description. A reading that could not be gathered is settled in code, with no
+        model consulted.
+      </>
+    ),
+    chip: "EXPLOIT · CLEAR · INDETERMINATE",
+  },
+  {
+    n: "04",
+    title: "The target stops itself",
+    body: (
+      <>
+        Only <span className="font-black">EXPLOIT</span> changes anything, once and
+        irreversibly. CISTERN reads the status at the top of every write method and
+        refuses itself. STANCH never calls it.
+      </>
+    ),
+    chip: 'UserError("STANCH_HALTED")',
+  },
+];
+
+function HowItWorks() {
   return (
-    <div
-      className={`rounded-[1.75rem] border-[3px] border-black p-5 shadow-[6px_6px_0px_#000000] ${
-        tone === "volt" ? "bg-[#CCFF00] text-black" : "bg-white text-black"
-      }`}
-    >
-      <h3 className="text-lg text-black">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-black/75">{children}</p>
-    </div>
+    <Section className="mt-16 md:mt-20">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 className="extrude-sm text-3xl text-white md:text-4xl">How it works</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/85">
+            Four steps. Exactly one of them asks a language model anything, and it is
+            asked about bytes read from the target, never about the claim.
+          </p>
+        </div>
+        <VoltPill>no privileged caller anywhere</VoltPill>
+      </div>
+
+      <ol className="mt-8 grid gap-5 [&>*]:min-w-0 md:grid-cols-2 xl:grid-cols-4">
+        {STEPS.map((step, index) => (
+          <li key={step.n} className="relative">
+            <article className="flex h-full flex-col rounded-[1.75rem] border-[3px] border-black bg-white p-5 text-black shadow-[6px_6px_0px_#000000]">
+              <span className="mono flex h-10 w-10 items-center justify-center rounded-full border-[3px] border-black bg-[#CCFF00] text-sm font-black text-black">
+                {step.n}
+              </span>
+              <h3 className="mt-3 text-base leading-tight text-black">{step.title}</h3>
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-black/75">
+                {step.body}
+              </p>
+              <code className="mt-4 block overflow-x-auto whitespace-nowrap rounded-xl bg-black px-3 py-2 font-[family-name:var(--font-mono)] text-[10px] leading-relaxed text-[#CCFF00]">
+                {step.chip}
+              </code>
+            </article>
+          </li>
+        ))}
+      </ol>
+
+      <div className="mt-6 rounded-[1.5rem] border-[3px] border-black bg-black px-5 py-4 shadow-[5px_5px_0px_#CCFF00]">
+        <p className="text-sm leading-relaxed text-white/85">
+          <span className="font-black uppercase tracking-wider text-[#CCFF00]">
+            The whole point:
+          </span>{" "}
+          step 2 is a read and step 4 is the target acting on itself. There is no step
+          where STANCH writes to anything it can halt — which is why{" "}
+          <Mono className="text-white">grep</Mono> can falsify the claim in under a
+          minute.
+        </p>
+      </div>
+    </Section>
   );
 }
 
