@@ -34,7 +34,7 @@ verdict that a registered target is compromised.
 > has no write path to anything it can halt — no key, no upgrader slot, no
 > permission. It publishes one word, and the target refuses itself.
 
-**[Demo video](#demo-video) · [Test the whole loop](docs/TESTING.md) · [Evidence room](#live-evidence) · [Verify it yourself](#verify-it-yourself) · [Run locally](#run-locally)**
+**[Live app](https://stanch.vercel.app) · [Demo video](#demo-video) · [Test the whole loop](docs/TESTING.md) · [Evidence room](#live-evidence) · [Verify it yourself](#verify-it-yourself) · [Run locally](#run-locally)**
 
 ---
 
@@ -68,6 +68,23 @@ verdict that a registered target is compromised.
 >
 > Everything the video would show is already reproducible from the tables below —
 > every claim, verdict and revert is a live transaction with a hash.
+
+---
+
+## Live
+
+**[stanch.vercel.app](https://stanch.vercel.app)** — reads the deployed contracts directly.
+No backend, no database, no fixtures. The registry, every verdict record and the
+proof room work with **no wallet connected**; only submitting a claim asks for a
+signature.
+
+| | |
+|---|---|
+| [Registry](https://stanch.vercel.app/) | every registered target and its live status |
+| [The halt](https://stanch.vercel.app/verdict/1) | `EXPLOIT` — claimable 1250 against deposited 1000 |
+| [The refusal](https://stanch.vercel.app/verdict/0) | `CLEAR` — the claim screamed, the numbers did not |
+| [The undecidable one](https://stanch.vercel.app/verdict/2) | `INDETERMINATE` — gathered fine, settled nothing |
+| [Proof room](https://stanch.vercel.app/proof) | every claim, the ledger, and every limitation |
 
 ---
 
