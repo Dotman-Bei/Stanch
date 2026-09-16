@@ -10,8 +10,18 @@ import {
 } from "@/lib/stanch/read";
 import type { RegistryRow } from "@/lib/stanch/types";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// Revalidate rather than force-dynamic.
+//
+// Studio Next allows 30 reads per minute and one pass over these four surfaces
+// costs about two dozen. force-dynamic would re-read the chain on every request,
+// and the in-process cache in lib/stanch/read.ts is per serverless instance, so
+// on a hosted deployment it dies on every cold start and is never shared between
+// concurrent visitors. A few simultaneous reviewers would exhaust the limit.
+//
+// 10 seconds is far shorter than the minutes a verdict takes to reach consensus,
+// so no page can show a stale halt status in any way that matters, and the
+// staleness bound is stated in the footer.
+export const revalidate = 10;
 
 export default async function ClaimPage() {
   let registry: RegistryRow[] = [];

@@ -40,6 +40,16 @@ function Footer() {
           third-party endorsement. STANCH is opt-in and pull-based: it cannot halt
           a contract that was not written to read it.
         </p>
+        <p className="mono mt-3 text-[11px] leading-relaxed text-white/55">
+          Every status and verdict on this site is read from the chain, cached for
+          at most 10 seconds. Studio Next limits reads to 30 per minute, and a
+          verdict takes minutes to reach consensus, so nothing here can be stale in
+          a way that changes what it says. To read the same state yourself with no
+          cache in the way:{" "}
+          <span className="text-[#CCFF00]">
+            python -m tools.observe_deployment &lt;STANCH address&gt;
+          </span>
+        </p>
       </div>
     </footer>
   );

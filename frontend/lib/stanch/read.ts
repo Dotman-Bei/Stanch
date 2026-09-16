@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { createClient } from "genlayer-js";
 import { GENLAYER_CHAIN } from "@/lib/genlayer/network";
 import {
@@ -83,14 +84,33 @@ function publicClient() {
   return createClient({ chain: GENLAYER_CHAIN });
 }
 
-async function readStanch(functionName: string, args: unknown[] = []): Promise<unknown> {
-  if (!STANCH_ADDRESS.startsWith("0x")) throw new StanchNotConfigured();
-  return cached(`${functionName}:${JSON.stringify(args)}`, () =>
-    publicClient().readContract({
+/**
+ * Read through Next's Data Cache, which on a hosted deployment is shared between
+ * serverless instances and survives cold starts. The in-process `cached` wrapper
+ * below it still helps within a single render and, unlike the Data Cache, can
+ * serve a stale value when the RPC rate-limits us.
+ *
+ * `/verdict/[index]` is a dynamic route, so route-level `revalidate` does not
+ * cache it. This does.
+ */
+const readThroughDataCache = unstable_cache(
+  async (functionName: string, argsJson: string): Promise<string> => {
+    const value = await publicClient().readContract({
       address: STANCH_ADDRESS as `0x${string}`,
       functionName,
-      args: args as never[],
-    }),
+      args: JSON.parse(argsJson) as never[],
+    });
+    return JSON.stringify(value ?? null);
+  },
+  ["stanch-read"],
+  { revalidate: 10, tags: ["stanch"] },
+);
+
+async function readStanch(functionName: string, args: unknown[] = []): Promise<unknown> {
+  if (!STANCH_ADDRESS.startsWith("0x")) throw new StanchNotConfigured();
+  const argsJson = JSON.stringify(args);
+  return cached(`${functionName}:${argsJson}`, async () =>
+    JSON.parse(await readThroughDataCache(functionName, argsJson)),
   );
 }
 

@@ -45,6 +45,28 @@ way that matters. If the limit is hit anyway, the page says *"Slow down a moment
 and states plainly that the contracts are fine, rather than claiming the chain
 could not be read.
 
+## Deploying it
+
+Vercel, or any Next host. Set the **Root Directory** to `frontend` — the repository
+root is the whole project and the app lives one level down.
+
+All six environment variables are `NEXT_PUBLIC_*`, so they are compiled into the
+client bundle and visible to anyone. That is correct: this app has no secrets and
+no backend. **Never add `STANCH_PRIVATE_KEY`** — the interface never reads it, and
+it exists only for `tools/` to deploy and test with.
+
+| Variable | Value |
+|---|---|
+| `NEXT_PUBLIC_GENLAYER_RPC_URL` | `https://studio-next.genlayer.com/api` |
+| `NEXT_PUBLIC_GENLAYER_CHAIN_ID` | `61997` |
+| `NEXT_PUBLIC_GENLAYER_CHAIN_NAME` | `GenLayer Studio Next` |
+| `NEXT_PUBLIC_GENLAYER_SYMBOL` | `GEN` |
+| `NEXT_PUBLIC_CONTRACT_ADDRESS` | the deployed STANCH address |
+| `NEXT_PUBLIC_EXPLORER_URL` | `https://explorer-studio-dev.genlayer.com` |
+
+`.npmrc` pins `legacy-peer-deps=true`, so the default install command works
+without an override.
+
 ## What the interface will not do
 
 - It never synthesises a value. If `NEXT_PUBLIC_CONTRACT_ADDRESS` is unset, or
