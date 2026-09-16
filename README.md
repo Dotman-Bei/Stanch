@@ -4,7 +4,7 @@
 
 # STANCH
 
-### **Publish a verdict. Touch nothing. The target halts itself.**
+### The halt authority never touches the target.<br/>The target reads the verdict and stops itself.
 
 </div>
 
