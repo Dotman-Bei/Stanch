@@ -112,9 +112,10 @@ function Hero() {
       <div className="relative pt-10 md:pt-16">
         <div className="grid items-center gap-10 [&>*]:min-w-0 md:grid-cols-[1.35fr_1fr]">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border-[3px] border-black bg-[#CCFF00] px-4 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-black">
-              Autonomous protocols · idea #1
-            </div>
+            {/* The eyebrow pill that sat here was removed. Its 31px of height is
+                kept so the headline holds its position against the floating
+                cards to the right, which are aligned to it. */}
+            <div aria-hidden className="h-[31px]" />
             <h1 className="extrude mt-5 max-w-[14ch] text-4xl leading-[0.98] text-white sm:text-5xl md:text-[4.1rem]">
               Halt is one‑way.{" "}
               <span className="text-[#CCFF00]">
