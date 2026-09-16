@@ -6,7 +6,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://stanch.vercel.app"),
-  title: "STANCH — halt authority with no write access",
+  title: "stanch",
   description:
     "Halt is one-way. STANCH halts other contracts when anyone proves an active exploit, and holds no key, no upgrader slot, and no write permission on anything it can halt.",
   manifest: "/site.webmanifest",
