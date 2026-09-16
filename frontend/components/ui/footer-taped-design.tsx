@@ -148,24 +148,8 @@ export function TapedFooter() {
         </div>
       </div>
 
-      <div className="mt-6 space-y-3">
-        <p className="text-[11px] leading-relaxed text-white/70">
-          STANCH runs on GenLayer Studio Next, chain 61997, with valueless test
-          tokens. Nothing here is an audit, a production-readiness claim, or a
-          third-party endorsement. STANCH is opt-in and pull-based: it cannot halt a
-          contract that was not written to read it.
-        </p>
-        <p className="mono text-[11px] leading-relaxed text-white/55">
-          Every status and verdict on this site is read from the chain, cached for at
-          most 10 seconds. Studio Next limits reads to 30 per minute, and a verdict
-          takes minutes to reach consensus, so nothing here can be stale in a way
-          that changes what it says. To read the same state yourself with no cache in
-          the way:{" "}
-          <span className="text-[#CCFF00]">
-            python -m tools.observe_deployment &lt;STANCH address&gt;
-          </span>
-        </p>
-        <div className="flex flex-col gap-2 border-t-2 border-white/15 pt-4 text-[11px] text-white/60 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-6">
+        <div className="flex flex-col gap-2 text-[11px] text-white/60 sm:flex-row sm:items-center sm:justify-between">
           <p>© {year} STANCH · MIT licensed · built for the GenLayer Agent Tank</p>
           <p className="mono">
             chain 61997 · <span className="text-white/75">{STANCH_ADDRESS}</span>

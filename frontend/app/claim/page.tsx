@@ -19,8 +19,7 @@ import type { RegistryRow } from "@/lib/stanch/types";
 // concurrent visitors. A few simultaneous reviewers would exhaust the limit.
 //
 // 10 seconds is far shorter than the minutes a verdict takes to reach consensus,
-// so no page can show a stale halt status in any way that matters, and the
-// staleness bound is stated in the footer.
+// so no page can show a stale halt status in any way that matters.
 export const revalidate = 10;
 
 export default async function ClaimPage() {
