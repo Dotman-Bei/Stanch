@@ -1,4 +1,4 @@
-import { ClaimForm } from "@/components/stanch/claim-form";
+import { ClaimForm } from "@/components/stanch/claim-form-loader";
 import { Mono } from "@/components/stanch/mono";
 import { Callout, PageTitle, Section, Tray } from "@/components/stanch/shell";
 import { NotConfigured, RateLimited, ReadFailed } from "@/components/stanch/states";

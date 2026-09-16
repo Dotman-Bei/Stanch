@@ -6,7 +6,7 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section className={`mx-auto w-full max-w-[1180px] px-4 md:px-8 ${className}`}>
+    <section className={`mx-auto w-full max-w-[1180px] px-4 md:px-8 2xl:max-w-[1440px] ${className}`}>
       {children}
     </section>
   );

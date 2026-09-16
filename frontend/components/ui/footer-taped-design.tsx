@@ -103,7 +103,7 @@ export function TapedFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mx-auto mt-12 w-full max-w-[1180px] px-4 pb-10 md:px-8">
+    <footer className="mx-auto mt-12 w-full max-w-[1180px] px-4 pb-10 md:px-8 2xl:max-w-[1440px]">
       <div className="relative rounded-[2rem] border-[3px] border-black bg-white px-5 py-9 shadow-[8px_8px_0px_#001A99] md:px-9">
         {/* The viewBox is 95x80, so the box has to keep that ratio or the strip
             shears. Each is pulled out past the corner so it reads as tape holding

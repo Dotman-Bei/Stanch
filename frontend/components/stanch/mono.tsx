@@ -1,4 +1,4 @@
-import { explorerAddress, explorerTx } from "@/lib/stanch/read";
+import { explorerAddress, explorerTx } from "@/lib/stanch/explorer";
 
 export function Mono({
   children,

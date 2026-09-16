@@ -93,7 +93,7 @@ function Hero() {
   return (
     <Section>
       <div className="relative pt-10 md:pt-16">
-        <div className="grid items-center gap-10 [&>*]:min-w-0 md:grid-cols-[1.35fr_1fr]">
+        <div className="grid items-center gap-10 [&>*]:min-w-0 lg:grid-cols-[1.35fr_1fr]">
           <div>
             {/* The eyebrow pill that sat here was removed. Its 31px of height is
                 kept so the headline holds its position against the floating
@@ -129,7 +129,7 @@ function Hero() {
             </div>
           </div>
 
-          <div className="relative flex justify-center md:justify-end">
+          <div className="relative hidden justify-center lg:flex lg:justify-end">
             <div className="frost w-56 rotate-[-9deg] rounded-[2rem] border border-white/40 p-6 shadow-2xl transition-transform duration-500 hover:rotate-0">
               <StopGlyph className="mx-auto h-14 w-14" />
               <div className="mt-4 text-center text-[11px] font-black uppercase tracking-[0.18em] text-white/80">
@@ -142,7 +142,7 @@ function Hero() {
                 There is no method that writes RUNNING after construction.
               </p>
             </div>
-            <div className="frost absolute -bottom-6 left-0 hidden w-44 rotate-[7deg] rounded-[1.5rem] border border-white/40 p-4 shadow-2xl md:block">
+            <div className="frost absolute -bottom-6 left-0 hidden w-44 rotate-[7deg] rounded-[1.5rem] border border-white/40 p-4 shadow-2xl xl:block">
               <div className="mono text-[10px] uppercase tracking-[0.14em] text-white/70">
                 upgraders
               </div>
