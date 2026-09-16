@@ -97,7 +97,7 @@ export default async function VerdictPage({
             <VerdictCard claim={claim} />
           </div>
 
-          <div className="mt-6 grid gap-5 md:grid-cols-[1.4fr_1fr]">
+          <div className="mt-6 grid gap-5 [&>*]:min-w-0 md:grid-cols-[1.4fr_1fr]">
             <Tray>
               <h3 className="text-xl text-black">How this verdict was reached</h3>
               <ol className="mt-4 space-y-4 text-sm text-black/75">
@@ -184,7 +184,7 @@ function Step({
       <span className="mono flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[3px] border-black bg-[#CCFF00] text-sm font-black text-black">
         {n}
       </span>
-      <span>
+      <span className="min-w-0">
         <span className="block text-[13px] font-black uppercase tracking-wider text-black">
           {title}
         </span>

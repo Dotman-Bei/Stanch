@@ -158,7 +158,7 @@ export default async function ProofPage() {
         </div>
       </div>
 
-      <div className="mt-12 grid gap-5 md:grid-cols-2">
+      <div className="mt-12 grid gap-5 [&>*]:min-w-0 md:grid-cols-2">
         <Tray>
           <h3 className="text-xl text-black">Feasibility gate (§11)</h3>
           <p className="mt-2 text-sm text-black/60">
@@ -171,7 +171,7 @@ export default async function ProofPage() {
                 key={id}
                 className="flex items-start justify-between gap-4 rounded-2xl border-[2.5px] border-black bg-white px-4 py-3"
               >
-                <div>
+                <div className="min-w-0">
                   <span className="mono text-[13px] font-bold text-black">{id}</span>
                   <p className="mt-0.5 text-[12px] leading-snug text-black/60">
                     {probe.question}
@@ -197,7 +197,7 @@ export default async function ProofPage() {
           <Callout title="Standing caveats">
             <ul className="space-y-2">
               {(LEDGER.standingCaveats ?? []).map((caveat) => (
-                <li key={caveat} className="flex gap-2">
+                <li key={caveat} className="flex min-w-0 gap-2">
                   <span className="text-[#CCFF00]">·</span>
                   <span>{caveat}</span>
                 </li>
@@ -309,7 +309,7 @@ function LedgerRow({ row }: { row: LedgerClaim }) {
           }`}
         >
           {(row.limitations ?? []).map((limitation) => (
-            <li key={limitation} className="flex gap-2">
+            <li key={limitation} className="flex min-w-0 gap-2">
               <span className={unmeasured ? "text-[#CCFF00]" : "text-[#0038FF]"}>·</span>
               <span>{limitation}</span>
             </li>

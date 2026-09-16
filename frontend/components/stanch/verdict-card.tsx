@@ -44,7 +44,7 @@ export function VerdictCard({
         {VERDICT_NOTE[claim.verdict] ?? VERDICT_NOTE.PENDING}
       </p>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className="mt-5 grid gap-4 [&>*]:min-w-0 md:grid-cols-2">
         <section>
           <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-black/50">
             1 · pinned reading
@@ -90,7 +90,7 @@ export function VerdictCard({
       </div>
 
       {dense ? null : (
-        <footer className="mt-5 grid gap-3 border-t-2 border-black/10 pt-4 text-[12px] md:grid-cols-3">
+        <footer className="mt-5 grid gap-3 border-t-2 border-black/10 pt-4 text-[12px] [&>*]:min-w-0 md:grid-cols-3">
           <Field label="registration key">
             <Mono>{claim.key || "—"}</Mono>
           </Field>

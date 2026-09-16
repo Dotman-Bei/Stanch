@@ -67,7 +67,7 @@ export default async function RegistryPage() {
       </Section>
 
       <Section className="mt-12">
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-5 [&>*]:min-w-0 md:grid-cols-3">
           <Power title="What it can do" tone="volt">
             Publish one verdict about one registered key, once.
           </Power>
@@ -94,7 +94,7 @@ export default async function RegistryPage() {
             </div>
             <VoltPill>{DEPLOYMENT.status === "UNDEPLOYED" ? "not deployed" : "live"}</VoltPill>
           </div>
-          <dl className="mt-5 grid gap-4 md:grid-cols-2">
+          <dl className="mt-5 grid gap-4 [&>*]:min-w-0 md:grid-cols-2">
             <DeployRow label="STANCH" record={DEPLOYMENT.stanch} fallback={STANCH_ADDRESS} />
             <DeployRow label="CISTERN (demo target)" record={DEPLOYMENT.cistern} />
             <DeployRow label="CISTERN-FIXED (control)" record={DEPLOYMENT.cistern_fixed} />
@@ -110,22 +110,23 @@ function Hero() {
   return (
     <Section>
       <div className="relative pt-10 md:pt-16">
-        <div className="grid items-center gap-10 md:grid-cols-[1.35fr_1fr]">
+        <div className="grid items-center gap-10 [&>*]:min-w-0 md:grid-cols-[1.35fr_1fr]">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border-[3px] border-black bg-[#CCFF00] px-4 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-black">
               Autonomous protocols · idea #1
             </div>
-            <h1 className="extrude mt-5 text-5xl leading-[0.9] text-white sm:text-6xl md:text-[5.2rem]">
-              Halt without
-              <br />
-              a guardian
+            <h1 className="extrude-sm mt-5 max-w-[15ch] text-3xl leading-[1.06] text-white sm:max-w-[17ch] sm:text-4xl md:text-[3.1rem]">
+              The halt authority never touches the target.{" "}
+              <span className="text-[#CCFF00]">
+                The target reads the verdict and stops itself.
+              </span>
             </h1>
-            <SquiggleUnderline className="mt-3 h-4 w-56" />
+            <SquiggleUnderline className="mt-4 h-4 w-56" />
             <p className="mt-6 max-w-xl text-base leading-relaxed text-white/90">
-              STANCH is a halt authority that has{" "}
-              <span className="font-black text-[#CCFF00]">no write access</span> to
-              anything it halts. It publishes a verdict. The target reads that verdict
-              and stops itself.
+              No key. No owner. No upgrader slot. STANCH holds exactly one power —
+              publish a verdict that a registered target is compromised — and{" "}
+              <span className="font-black text-[#CCFF00]">no write path</span> to
+              anything it can halt.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link

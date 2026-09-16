@@ -87,6 +87,10 @@ h3,
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
+  /* Addresses, hashes and dotted SDK identifiers are single unbreakable tokens.
+     Inside a flex or grid child (min-width: auto) they cannot shrink and push
+     the whole page wider than the viewport on a phone. */
+  overflow-wrap: anywhere;
 }
 
 .frost {

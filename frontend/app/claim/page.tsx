@@ -66,7 +66,7 @@ export default async function ClaimPage() {
             <ClaimForm registry={registry} />
           </div>
 
-          <div className="mt-8 grid gap-5 lg:grid-cols-[1fr_1fr]">
+          <div className="mt-8 grid gap-5 [&>*]:min-w-0 lg:grid-cols-[1fr_1fr]">
             <Tray>
               <h3 className="text-xl text-black">The standard, as it is in the code</h3>
               <p className="mt-2 text-sm text-black/60">
