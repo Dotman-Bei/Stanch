@@ -1,0 +1,77 @@
+{
+  "preparedAtUtc": "2026-09-16T10:53:31Z",
+  "sandboxes": [
+    {
+      "key": "sandbox-1",
+      "address": "0x5Ef010ff7B96465386657EFa64Fcf3398Ea363a7",
+      "explorer": "https://explorer-studio-dev.genlayer.com/address/0x5Ef010ff7B96465386657EFa64Fcf3398Ea363a7",
+      "deployTx": "0x6a68678c3e29aedffd65f87913f25654421acabdcdff397bcf8b299b5a2f5eff",
+      "status": "RUNNING",
+      "vaultReport": {
+        "accrual_calls": "1",
+        "excess_claimable": "250",
+        "invariant": "total_claimable must never exceed total_deposited",
+        "stanch": "0xe3C5B525a413797F86a2742C9C5d1502045EBC24",
+        "stanch_key": "sandbox-1",
+        "total_claimable": "1250",
+        "total_deposited": "1000"
+      },
+      "invariantBroken": true,
+      "preparedAtUtc": "2026-09-16T10:52:12Z"
+    },
+    {
+      "key": "sandbox-2",
+      "address": "0xEa04F921b5358c940A368De2352A5A0C6303238D",
+      "explorer": "https://explorer-studio-dev.genlayer.com/address/0xEa04F921b5358c940A368De2352A5A0C6303238D",
+      "deployTx": "0x123cad7d1d614a2354db52cd9837d0ba4a814b83d95d6742cc0f145be6d561b2",
+      "status": "RUNNING",
+      "vaultReport": {
+        "accrual_calls": "1",
+        "excess_claimable": "250",
+        "invariant": "total_claimable must never exceed total_deposited",
+        "stanch": "0xe3C5B525a413797F86a2742C9C5d1502045EBC24",
+        "stanch_key": "sandbox-2",
+        "total_claimable": "1250",
+        "total_deposited": "1000"
+      },
+      "invariantBroken": true,
+      "preparedAtUtc": "2026-09-16T10:52:38Z"
+    },
+    {
+      "key": "sandbox-3",
+      "address": "0x0ec07b5BD860ec735A14ad0646E870bB6031d700",
+      "explorer": "https://explorer-studio-dev.genlayer.com/address/0x0ec07b5BD860ec735A14ad0646E870bB6031d700",
+      "deployTx": "0x1f40be99cbcdd9495392087ff0b629925a000163c83017419b3198cee3e55e51",
+      "status": "RUNNING",
+      "vaultReport": {
+        "accrual_calls": "1",
+        "excess_claimable": "250",
+        "invariant": "total_claimable must never exceed total_deposited",
+        "stanch": "0xe3C5B525a413797F86a2742C9C5d1502045EBC24",
+        "stanch_key": "sandbox-3",
+        "total_claimable": "1250",
+        "total_deposited": "1000"
+      },
+      "invariantBroken": true,
+      "preparedAtUtc": "2026-09-16T10:53:04Z"
+    },
+    {
+      "key": "sandbox-4",
+      "address": "0x5991405E0dB11d302Bf42390C7789A3681E604Bc",
+      "explorer": "https://explorer-studio-dev.genlayer.com/address/0x5991405E0dB11d302Bf42390C7789A3681E604Bc",
+      "deployTx": "0x9ee88955396dae8bc2c9f282ca4e591f46073458f5fb14aecf91944fbb60d777",
+      "status": "RUNNING",
+      "vaultReport": {
+        "accrual_calls": "1",
+        "excess_claimable": "250",
+        "invariant": "total_claimable must never exceed total_deposited",
+        "stanch": "0xe3C5B525a413797F86a2742C9C5d1502045EBC24",
+        "stanch_key": "sandbox-4",
+        "total_claimable": "1250",
+        "total_deposited": "1000"
+      },
+      "invariantBroken": true,
+      "preparedAtUtc": "2026-09-16T10:53:31Z"
+    }
+  ]
+}
