@@ -67,7 +67,7 @@ export default async function ClaimPage() {
 
           <div className="mt-8 grid gap-5 [&>*]:min-w-0 lg:grid-cols-[1fr_1fr]">
             <Tray>
-              <h3 className="text-xl text-black">The standard, as it is in the code</h3>
+              <h2 className="text-xl text-black">The standard, as it is in the code</h2>
               <p className="mt-2 text-sm text-black/60">
                 Read live from <Mono>Stanch.standard()</Mono>. It is a module-level
                 constant, not a writable slot: there is no method that changes it, and
@@ -96,7 +96,7 @@ export default async function ClaimPage() {
               </Callout>
 
               <Tray>
-                <h3 className="text-xl text-black">A condition must be readable now</h3>
+                <h2 className="text-xl text-black">A condition must be readable now</h2>
                 <p className="mt-2 text-sm leading-relaxed text-black/70">
                   STANCH can only halt on a condition visible in the target&apos;s public
                   view surface at verdict time. It cannot read historical state or

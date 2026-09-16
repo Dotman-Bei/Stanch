@@ -192,6 +192,7 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
             ))}
           </div>
           <textarea
+            aria-label="Reading recipe, as JSON naming the target's view methods"
             value={spec}
             onChange={(event) => {
               setSpec(event.target.value);
@@ -218,6 +219,7 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
           hint="Prose. Recorded on chain and shown beside the verdict — and never the basis of it. A forceful description does not move the answer."
         >
           <textarea
+            aria-label="The pattern you assert is present in the reading"
             value={pattern}
             onChange={(event) => setPattern(event.target.value)}
             rows={4}
@@ -289,7 +291,7 @@ export function ClaimForm({ registry }: { registry: RegistryRow[] }) {
       <div className="space-y-5">
         <div className="frost rounded-[2rem] border-[1.5px] border-white/40 p-5 md:p-7">
           <div className="flex items-center justify-between gap-3">
-            <h3 className="text-xl text-white">Exactly what gets classified</h3>
+            <h2 className="text-xl text-white">Exactly what gets classified</h2>
             <VoltPill>preview</VoltPill>
           </div>
           <p className="mt-2 text-[13px] leading-relaxed text-white/80">

@@ -87,9 +87,9 @@ function Column({
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-2 md:gap-3">
-      <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-black/40">
+      <h3 className="text-[11px] font-black uppercase tracking-[0.18em] text-black/40">
         {title}
-      </h4>
+      </h3>
       <div className="flex flex-col items-start gap-1.5">
         {links.map((link) => (
           <FooterLink key={link.href + link.label} {...link} />

@@ -46,9 +46,9 @@ export function VerdictCard({
 
       <div className="mt-5 grid gap-4 [&>*]:min-w-0 md:grid-cols-2">
         <section>
-          <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-black/50">
+          <h2 className="text-[11px] font-black uppercase tracking-[0.18em] text-black/50">
             1 · pinned reading
-          </h4>
+          </h2>
           <p className="mt-1 text-[11px] text-black/50">
             Read from the target under <Mono>strict_eq</Mono>. Validators agree on
             these bytes before any model sees them.
@@ -72,9 +72,9 @@ export function VerdictCard({
         </section>
 
         <section>
-          <h4 className="text-[11px] font-black uppercase tracking-[0.18em] text-black/50">
+          <h2 className="text-[11px] font-black uppercase tracking-[0.18em] text-black/50">
             2 · the claimant&apos;s pattern
-          </h4>
+          </h2>
           <p className="mt-1 text-[11px] text-black/50">
             Prose. Never the basis of the verdict.
           </p>
