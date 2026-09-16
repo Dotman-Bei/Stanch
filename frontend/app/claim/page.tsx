@@ -1,8 +1,13 @@
 import { ClaimForm } from "@/components/stanch/claim-form";
 import { Mono } from "@/components/stanch/mono";
 import { Callout, PageTitle, Section, Tray } from "@/components/stanch/shell";
-import { NotConfigured, ReadFailed } from "@/components/stanch/states";
-import { StanchNotConfigured, fetchRegistry, fetchStandard } from "@/lib/stanch/read";
+import { NotConfigured, RateLimited, ReadFailed } from "@/components/stanch/states";
+import {
+  StanchNotConfigured,
+  isRateLimitError,
+  fetchRegistry,
+  fetchStandard,
+} from "@/lib/stanch/read";
 import type { RegistryRow } from "@/lib/stanch/types";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +17,7 @@ export default async function ClaimPage() {
   let registry: RegistryRow[] = [];
   let standard = "";
   let error: string | null = null;
+  let limited: string | null = null;
   let configured = true;
 
   try {
@@ -19,6 +25,9 @@ export default async function ClaimPage() {
     standard = await fetchStandard();
   } catch (exception) {
     if (exception instanceof StanchNotConfigured) configured = false;
+    else if (isRateLimitError(exception))
+      limited =
+        exception instanceof Error ? exception.message : String(exception);
     else error = exception instanceof Error ? exception.message : String(exception);
   }
 
@@ -38,9 +47,10 @@ export default async function ClaimPage() {
       />
 
       {!configured ? <NotConfigured /> : null}
+      {limited ? <RateLimited detail={limited} /> : null}
       {error ? <ReadFailed detail={error} /> : null}
 
-      {configured && !error ? (
+      {configured && !error && !limited ? (
         <>
           <div className="mt-8">
             <ClaimForm registry={registry} />

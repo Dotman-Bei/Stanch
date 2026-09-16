@@ -3,10 +3,11 @@ import { notFound } from "next/navigation";
 import { AddressLink, Mono } from "@/components/stanch/mono";
 import { LabelPill, StatusPill } from "@/components/stanch/pills";
 import { Callout, PageTitle, Section, Tray } from "@/components/stanch/shell";
-import { NotConfigured, ReadFailed } from "@/components/stanch/states";
+import { NotConfigured, RateLimited, ReadFailed } from "@/components/stanch/states";
 import { VerdictCard } from "@/components/stanch/verdict-card";
 import {
   StanchNotConfigured,
+  isRateLimitError,
   fetchClaim,
   fetchClaimCount,
   fetchStatus,
@@ -29,6 +30,7 @@ export default async function VerdictPage({
   let count = 0;
   let status: HaltStatus = "UNKNOWN";
   let error: string | null = null;
+  let limited: string | null = null;
   let configured = true;
 
   try {
@@ -37,6 +39,9 @@ export default async function VerdictPage({
     if (claim) status = await fetchStatus(claim.key);
   } catch (exception) {
     if (exception instanceof StanchNotConfigured) configured = false;
+    else if (isRateLimitError(exception))
+      limited =
+        exception instanceof Error ? exception.message : String(exception);
     else error = exception instanceof Error ? exception.message : String(exception);
   }
 
@@ -57,9 +62,10 @@ export default async function VerdictPage({
       />
 
       {!configured ? <NotConfigured /> : null}
+      {limited ? <RateLimited detail={limited} /> : null}
       {error ? <ReadFailed detail={error} /> : null}
 
-      {configured && !error && !claim ? (
+      {configured && !error && !limited && !claim ? (
         <Tray className="mt-8">
           <h2 className="text-2xl text-black">No claim at index {position}</h2>
           <p className="mt-3 text-sm text-black/70">

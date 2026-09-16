@@ -20,6 +20,23 @@ export function NotConfigured() {
   );
 }
 
+export function RateLimited({ detail }: { detail: string }) {
+  return (
+    <Tray className="mt-8">
+      <h2 className="text-2xl text-black md:text-3xl">Slow down a moment</h2>
+      <p className="mt-3 text-sm leading-relaxed text-black/70">
+        Studio Next limits reads to 30 per minute and this page hit that ceiling.
+        <span className="font-black"> Nothing is wrong with the contracts.</span>{" "}
+        Wait a few seconds and reload; the state below is read live rather than
+        cached from a build, which is why it costs requests.
+      </p>
+      <pre className="mono mt-4 overflow-auto rounded-2xl border-[2.5px] border-black bg-white px-4 py-3 text-[12px] text-black">
+        {detail}
+      </pre>
+    </Tray>
+  );
+}
+
 export function ReadFailed({ detail }: { detail: string }) {
   return (
     <Tray className="mt-8">

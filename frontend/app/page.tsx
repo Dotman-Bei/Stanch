@@ -2,9 +2,14 @@ import Link from "next/link";
 import { AddressLink, Mono, TxLink } from "@/components/stanch/mono";
 import { LabelPill, StatusPill, VoltPill } from "@/components/stanch/pills";
 import { Callout, FrostPanel, PageTitle, Section, Tray } from "@/components/stanch/shell";
-import { NotConfigured, ReadFailed } from "@/components/stanch/states";
+import { NotConfigured, RateLimited, ReadFailed } from "@/components/stanch/states";
 import { ArrowVoltRight, SquiggleUnderline, StopGlyph } from "@/components/stanch/doodles";
-import { STANCH_ADDRESS, StanchNotConfigured, fetchRegistry } from "@/lib/stanch/read";
+import {
+  STANCH_ADDRESS,
+  StanchNotConfigured,
+  isRateLimitError,
+  fetchRegistry,
+} from "@/lib/stanch/read";
 import { DEPLOYMENT, registrationTx } from "@/lib/stanch/deployment";
 import type { RegistryRow } from "@/lib/stanch/types";
 
@@ -14,12 +19,16 @@ export const revalidate = 0;
 export default async function RegistryPage() {
   let rows: RegistryRow[] = [];
   let error: string | null = null;
+  let limited: string | null = null;
   let configured = true;
 
   try {
     rows = await fetchRegistry();
   } catch (exception) {
     if (exception instanceof StanchNotConfigured) configured = false;
+    else if (isRateLimitError(exception))
+      limited =
+        exception instanceof Error ? exception.message : String(exception);
     else error = exception instanceof Error ? exception.message : String(exception);
   }
 
@@ -42,8 +51,9 @@ export default async function RegistryPage() {
         </div>
 
         {!configured ? <NotConfigured /> : null}
-        {error ? <ReadFailed detail={error} /> : null}
-        {configured && !error ? <RegistryTable rows={rows} /> : null}
+        {limited ? <RateLimited detail={limited} /> : null}
+      {error ? <ReadFailed detail={error} /> : null}
+        {configured && !error && !limited ? <RegistryTable rows={rows} /> : null}
       </Section>
 
       <Section className="mt-12">

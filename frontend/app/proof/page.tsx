@@ -4,8 +4,12 @@ import probeResults from "@/lib/stanch/probes.json";
 import { AddressLink, Mono } from "@/components/stanch/mono";
 import { LabelPill, VerdictPill, VoltPill } from "@/components/stanch/pills";
 import { Callout, PageTitle, Section, Tray } from "@/components/stanch/shell";
-import { NotConfigured, ReadFailed } from "@/components/stanch/states";
-import { StanchNotConfigured, fetchAllClaims } from "@/lib/stanch/read";
+import { NotConfigured, RateLimited, ReadFailed } from "@/components/stanch/states";
+import {
+  StanchNotConfigured,
+  fetchAllClaims,
+  isRateLimitError,
+} from "@/lib/stanch/read";
 import type { ClaimRecord } from "@/lib/stanch/types";
 import { parseReading } from "@/lib/stanch/types";
 
@@ -46,12 +50,16 @@ const STATUS_STYLE: Record<string, string> = {
 export default async function ProofPage() {
   let claims: ClaimRecord[] = [];
   let error: string | null = null;
+  let limited: string | null = null;
   let configured = true;
 
   try {
     claims = await fetchAllClaims();
   } catch (exception) {
     if (exception instanceof StanchNotConfigured) configured = false;
+    else if (isRateLimitError(exception))
+      limited =
+        exception instanceof Error ? exception.message : String(exception);
     else error = exception instanceof Error ? exception.message : String(exception);
   }
 
@@ -85,9 +93,10 @@ export default async function ProofPage() {
       </div>
 
       {!configured ? <NotConfigured /> : null}
+      {limited ? <RateLimited detail={limited} /> : null}
       {error ? <ReadFailed detail={error} /> : null}
 
-      {configured && !error ? (
+      {configured && !error && !limited ? (
         <div className="mt-10">
           <h2 className="extrude-sm text-3xl text-white md:text-4xl">
             Claims submitted on chain

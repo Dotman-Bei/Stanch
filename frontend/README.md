@@ -33,6 +33,18 @@ To refresh the addresses, probe results and claim ledger the pages read from:
 cd .. && .venv/bin/python -m tools.sync_frontend
 ```
 
+## Rate limits
+
+Studio Next allows **30 reads per minute**. Every page reads the chain live, and
+one pass over the four surfaces costs roughly two dozen calls, so a reviewer
+clicking quickly would otherwise be rate-limited into an error page.
+
+Reads are cached for **10 seconds** and no longer — far shorter than the minutes a
+verdict takes to reach consensus, so no page can show a stale halt status in any
+way that matters. If the limit is hit anyway, the page says *"Slow down a moment"*
+and states plainly that the contracts are fine, rather than claiming the chain
+could not be read.
+
 ## What the interface will not do
 
 - It never synthesises a value. If `NEXT_PUBLIC_CONTRACT_ADDRESS` is unset, or
