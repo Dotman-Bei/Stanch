@@ -4,7 +4,7 @@
 
 # STANCH
 
-### The halt authority never touches the target.<br/>The target reads the verdict and stops itself.
+### Halt is one‑way.<br/>That isn't a limitation, it's the guarantee.
 
 </div>
 

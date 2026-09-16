@@ -115,10 +115,10 @@ function Hero() {
             <div className="inline-flex items-center gap-2 rounded-full border-[3px] border-black bg-[#CCFF00] px-4 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-black">
               Autonomous protocols · idea #1
             </div>
-            <h1 className="extrude-sm mt-5 max-w-[15ch] text-3xl leading-[1.06] text-white sm:max-w-[17ch] sm:text-4xl md:text-[3.1rem]">
-              The halt authority never touches the target.{" "}
+            <h1 className="extrude mt-5 max-w-[14ch] text-4xl leading-[0.98] text-white sm:text-5xl md:text-[4.1rem]">
+              Halt is one‑way.{" "}
               <span className="text-[#CCFF00]">
-                The target reads the verdict and stops itself.
+                That isn&apos;t a limitation, it&apos;s the guarantee.
               </span>
             </h1>
             <SquiggleUnderline className="mt-4 h-4 w-56" />
