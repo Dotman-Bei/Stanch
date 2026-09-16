@@ -1,9 +1,9 @@
 {
   "schemaVersion": "stanch.claims/1",
   "project": "STANCH",
-  "updatedAtUtc": "2026-09-15T17:15:42Z",
+  "updatedAtUtc": "2026-09-16T12:05:41Z",
   "revision": {
-    "baseCommit": "41a8614231ca9cdfce29ad20e4ff1da4130844f5",
+    "baseCommit": "dbcfff19430b7dad140e2ea028c04356f6812af3",
     "branch": "main"
   },
   "network": {
@@ -55,7 +55,7 @@
         "chainId": 61997,
         "probe": "P3"
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -76,7 +76,7 @@
         "chainId": 61997,
         "probe": "P2"
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -143,7 +143,7 @@
       "scope": {
         "contract": "contracts/stanch.py"
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "evidence/source-inspection/n1-no-resume.txt",
         "evidence/tests/transcript.txt"
@@ -166,7 +166,7 @@
       "scope": {
         "contract": "contracts/stanch.py"
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "evidence/source-inspection/n2-no-write-path.txt"
       ],
@@ -188,7 +188,7 @@
         "contract": "contracts/stanch.py",
         "chainId": 61997
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "evidence/source-inspection/n3-no-payable.txt"
       ],
@@ -211,7 +211,7 @@
         "chainId": 61997,
         "gate": "G5"
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "evidence/studio-next/g5-false-claim.json"
       ],
@@ -234,7 +234,7 @@
         "chainId": 61997,
         "probe": "P5"
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "probes/results.json"
       ],
@@ -259,7 +259,7 @@
         "chainId": 61997,
         "gate": "G3"
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "evidence/studio-next/g3-true-halt.json"
       ],
@@ -281,7 +281,7 @@
         "chainId": 61997,
         "gate": "G4"
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "evidence/studio-next/g4-halted-revert.json"
       ],
@@ -303,7 +303,7 @@
         "chainId": 61997,
         "gate": "G6"
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "evidence/studio-next/g6-indeterminate.json"
       ],
@@ -327,7 +327,7 @@
       "scope": {
         "campaign": "PRD section 20"
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "evidence/studio-next/campaign.json"
       ],
@@ -351,7 +351,7 @@
         "chainId": 61997,
         "campaign": "PRD section 20, attack 3"
       },
-      "observedAtUtc": "2026-09-15T17:15:42Z",
+      "observedAtUtc": "2026-09-16T12:05:41Z",
       "evidence": [
         "evidence/studio-next/campaign.json"
       ],

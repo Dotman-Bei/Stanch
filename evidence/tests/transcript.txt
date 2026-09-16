@@ -1,7 +1,7 @@
 STANCH test transcript
 network: Studio Next, chain 61997
-run:     2026-09-15T17:15:41Z
-commit:  41a8614231ca9cdfce29ad20e4ff1da4130844f5
+run:     2026-09-16T12:05:40Z
+commit:  dbcfff19430b7dad140e2ea028c04356f6812af3
 command: gltest tests/ -v
 
 Every test runs against Studio Next. Nothing here is mocked or local.
@@ -34,4 +34,4 @@ tests/test_verdict_pipeline.py::test_a_claim_against_an_unregistered_key_halts_n
 tests/test_verdict_pipeline.py::test_a_malformed_reading_spec_halts_nothing PASSED [ 95%]
 tests/test_verdict_pipeline.py::test_a_violated_invariant_halts_the_target PASSED [100%]
 
-  ======================== 24 passed in 824.00s (0:13:43) ========================
+  ======================== 24 passed in 588.94s (0:09:48) ========================
